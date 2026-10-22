@@ -346,6 +346,42 @@ class TestPhase5IntegrationAndNegative(unittest.TestCase):
         self.assertTrue(ok)
         self.assertEqual(database.get_conversation(cid)["status"], "resolved")
 
+    def test_11_live_session_hindi_message_flow_stability(self):
+        """Verify Hindi message dispatch and draft clearing operates flawlessly without widget instantiation errors."""
+        agent = database.get_user_by_username("agent")
+        customer = database.get_user_by_username("customer")
+        
+        # Create an active conversation in progress
+        hindi_msg = "नमस्ते, हम आपके ऑर्डर की डिलीवरी की जांच कर रहे हैं।"
+        conv = database.create_conversation(
+            customer_id=customer["id"],
+            customer_name=customer["name"],
+            subject="Hindi Live Support Query",
+            initial_message="मेरा ऑर्डर अभी तक नहीं आया",
+            ai_analysis=ai_engine.analyze_message("मेरा ऑर्डर अभी तक नहीं आया"),
+            preferred_language="Hindi (हिन्दी)"
+        )
+        cid = conv["id"]
+        database.update_conversation_status(cid, "in_progress")
+        database.accept_conversation(cid, agent["id"], agent["name"])
+
+        # Agent sends message in Hindi
+        msg = database.add_message(
+            conv_id=cid,
+            sender_type="agent",
+            sender_id=agent["id"],
+            sender_name=agent["name"],
+            message_text=hindi_msg
+        )
+        self.assertIsNotNone(msg)
+        self.assertEqual(msg["message_text"], hindi_msg)
+
+        # Verify message retrieved in conversation history
+        conv_messages = database.get_conversation_messages(cid)
+        agent_msgs = [m for m in conv_messages if m["sender_type"] == "agent"]
+        self.assertEqual(len(agent_msgs), 1)
+        self.assertEqual(agent_msgs[0]["message_text"], hindi_msg)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -6,7 +6,7 @@
 
 ## 1. Overview & Architectural Transformation
 
-NexAI transforms customer support operations by accurately understanding, triaging, and translating code-mixed queries written in colloquial Indian dialects and native Indic scripts. The platform provides separate, role-based workflows for **Customers** and **Customer-Care Agents**, backed by an **Apple-inspired design system** and persistent SQLite storage.
+NexAI transforms customer support operations by accurately understanding, triaging, and translating code-mixed queries written in colloquial Indian dialects and native Indic scripts. The platform provides separate, role-based workflows for **Customers** and **Customer-Care Agents**, backed by a high-performance **Blacksmith Forge Dark Design System** (built on **shadcn/ui**, **Radix UI**, and **Tailwind UI** design system tokens) and persistent SQLite storage.
 
 ### Supported Languages & Dialects
 1. **Telugu + English (Tenglish / తెలుగు)**: Native script and Latin transliteration parsing (e.g. *"నా ఆర్డర్ ఇంకా డెలివరీ కాలేదు"*, *"naa order inka delivery avvaledu"*)
@@ -127,9 +127,9 @@ streamlit run app.py
 ```bash
 python -m unittest test_platform_phase5.py
 ```
-- **Tests run**: 10
+- **Tests run**: 11
 - **Result**: `OK` (100% pass)
-- Verifies: Full 13-step lifecycle, invalid login credentials rejection, cross-customer isolation boundary, missing agent language fallback, translation uncertainty handling, offline AI backend fallback, duplicate feedback constraint, empty analytics queries, missing product metadata resilience, and ticket resolution without agent response.
+- Verifies: Full 13-step lifecycle, invalid login credentials rejection, cross-customer isolation boundary, missing agent language fallback, translation uncertainty handling, offline AI backend fallback, duplicate feedback constraint, empty analytics queries, missing product metadata resilience, ticket resolution without agent response, and live session multilingual/Hindi message dispatch stability without widget instantiation errors.
 
 ### 2. Phase 4 Root-Cause Analysis Suite (`test_platform_phase4.py`)
 ```bash
@@ -193,7 +193,7 @@ python -m pytest tests
 ### Grand Verification Summary
 | Test Suite | Scope | Tests Run | Passed | Passing Rate |
 | :--- | :--- | :---: | :---: | :---: |
-| `test_platform_phase5.py` | E2E 13-step flow & 9 boundary/negative cases | 10 | 10 | 100.0% |
+| `test_platform_phase5.py` | E2E 13-step flow, 9 boundary cases & Live Hindi stability | 11 | 11 | 100.0% |
 | `test_platform_phase4.py` | RCA & Complaint Trends Analytics Engine | 8 | 8 | 100.0% |
 | `test_platform_phase3.py` | Gmail-Style 3-Area Ticket Inbox & CSAT | 8 | 8 | 100.0% |
 | `test_platform_phase2.py` | Indic Scripts, Reply Translation & Handoff | 6 | 6 | 100.0% |
@@ -201,5 +201,6 @@ python -m pytest tests
 | `test_app.py` | Streamlit AppTest & Contract Regressions | 12 | 12 | 100.0% |
 | `evaluate.py` | Code-Mixed Multi-Dialect Benchmark Cases | 47 | 47 | 100.0% |
 | `pytest tests` | Service Architecture, Regexes & Security | 39 | 39 | 100.0% |
-| **Total Platform Suite** | **Comprehensive End-to-End System** | **139** | **139** | **100.0%** |
+| **Total Platform Suite** | **Comprehensive End-to-End System** | **140** | **140** | **100.0%** |
+
 

@@ -33,74 +33,117 @@ import database
 from test_cases import TEST_CASES
 
 # -----------------------------------------------------------------------------
-# 1. Page Configuration & Apple-Inspired Design System with Indic Font Support
+# 1. Page Configuration & Blacksmith Design System with Indic Font Support
 # -----------------------------------------------------------------------------
 
 st.set_page_config(
     page_title="NexAI Multilingual Support Platform",
-    page_icon="",
+    page_icon="⚒️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Apple-inspired clean, restrained styling with full native Indic typography
+# Blacksmith-inspired forged dark styling with full native Indic typography & shadcn/Radix tokens
 st.markdown("""
 <style>
-    /* Global Typography & Canvas */
-    html, body, [class*="css"], .stMarkdown, p, div, span, input, textarea {
+    /* Global Typography, Canvas & Forge Theme */
+    html, body, [class*="css"], .stApp, .stMarkdown, p, div, span, input, textarea {
         font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
                      "Noto Sans Tamil", "Latha", "Vijaya",
                      "Noto Sans Telugu", "Gautami", "Vani",
                      "Noto Sans Devanagari", "Mangal",
-                     "Helvetica Neue", Helvetica, Arial, sans-serif;
-        color: #1d1d1f;
+                     "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        color: #f1f5f9;
         -webkit-font-smoothing: antialiased;
     }
     
-    /* Top Headers */
-    .apple-header {
+    .stApp {
+        background-color: #0d0f12 !important;
+    }
+
+    /* Top Headers with Forge Aesthetics */
+    .apple-header, .forge-header {
         font-size: 1.85rem;
-        font-weight: 600;
-        color: #1d1d1f;
+        font-weight: 700;
+        color: #f8fafc;
         letter-spacing: -0.025em;
         margin-top: 0.2rem;
         margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
-    .apple-sub {
+    .apple-sub, .forge-sub {
         font-size: 0.95rem;
-        color: #6e6e73;
+        color: #94a3b8;
         margin-bottom: 1.4rem;
         font-weight: 400;
-        line-height: 1.45;
+        line-height: 1.5;
     }
 
-    /* Cards */
-    .apple-card {
-        background-color: #ffffff;
-        border: 1px solid #d2d2d7;
+    /* Tabs Styling - Separate Cards with Distinct Spacing & Glowing Ember Active State */
+    [data-baseweb="tab-list"], .stTabs [role="tablist"] {
+        gap: 12px !important;
+        background-color: transparent !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+        padding: 6px 0 12px 0 !important;
+        margin-bottom: 18px !important;
+    }
+    [data-baseweb="tab"], .stTabs [role="tab"] {
+        background: #161920 !important;
+        color: #94a3b8 !important;
+        border: 1px solid rgba(255, 255, 255, 0.09) !important;
+        border-radius: 8px !important;
+        padding: 10px 22px !important;
+        margin-right: 8px !important;
+        font-weight: 600 !important;
+        font-size: 0.90rem !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35) !important;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    [data-baseweb="tab"]:hover, .stTabs [role="tab"]:hover {
+        background: #1f242e !important;
+        color: #fb923c !important;
+        border-color: rgba(249, 115, 22, 0.45) !important;
+        box-shadow: 0 0 14px rgba(249, 115, 22, 0.2) !important;
+    }
+    [data-baseweb="tab"][aria-selected="true"], .stTabs [role="tab"][aria-selected="true"] {
+        background: linear-gradient(135deg, #27170e 0%, #171310 100%) !important;
+        color: #fb923c !important;
+        border: 1px solid #f97316 !important;
+        box-shadow: 0 0 16px rgba(249, 115, 22, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+    }
+    [data-baseweb="tab-highlight"], [data-baseweb="tab-border"] {
+        display: none !important;
+    }
+
+    /* Cards - Hammered Anvil & Steel */
+    .apple-card, .forge-card {
+        background-color: #14171f;
+        border: 1px solid rgba(255, 255, 255, 0.09);
         border-radius: 12px;
         padding: 18px 22px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+        box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(249, 115, 22, 0.05);
         margin-bottom: 14px;
         transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .apple-card:hover {
-        border-color: #0071e3;
-        box-shadow: 0 3px 8px rgba(0, 113, 227, 0.06);
+    .apple-card:hover, .forge-card:hover {
+        border-color: rgba(249, 115, 22, 0.45);
+        box-shadow: 0 6px 24px -2px rgba(249, 115, 22, 0.18);
     }
-    .apple-card-title {
+    .apple-card-title, .forge-card-title {
         font-size: 0.78rem;
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #86868b;
+        letter-spacing: 0.06em;
+        color: #94a3b8;
         margin-bottom: 6px;
     }
-    .apple-card-value {
-        font-size: 1.45rem;
-        font-weight: 600;
-        color: #1d1d1f;
-        letter-spacing: -0.015em;
+    .apple-card-value, .forge-card-value {
+        font-size: 1.55rem;
+        font-weight: 700;
+        color: #f8fafc;
+        letter-spacing: -0.02em;
     }
 
     /* Badges & Pills */
@@ -113,57 +156,60 @@ st.markdown("""
         letter-spacing: 0.01em;
     }
     .badge-high {
-        background-color: #fff2f2;
-        color: #d70015;
-        border: 1px solid #ffc8c8;
+        background-color: #2b1315;
+        color: #f87171;
+        border: 1px solid #7f1d1d;
         padding: 3px 10px;
         border-radius: 9999px;
-        font-weight: 600;
-        font-size: 0.82rem;
+        font-weight: 700;
+        font-size: 0.80rem;
         display: inline-block;
+        letter-spacing: 0.02em;
     }
     .badge-medium {
-        background-color: #fff9f0;
-        color: #b25e00;
-        border: 1px solid #ffe6c3;
+        background-color: #2b1d0c;
+        color: #fbbf24;
+        border: 1px solid #78350f;
         padding: 3px 10px;
         border-radius: 9999px;
-        font-weight: 600;
-        font-size: 0.82rem;
+        font-weight: 700;
+        font-size: 0.80rem;
         display: inline-block;
+        letter-spacing: 0.02em;
     }
     .badge-low {
-        background-color: #f2faf4;
-        color: #1b8738;
-        border: 1px solid #c8eed2;
+        background-color: #0d281e;
+        color: #34d399;
+        border: 1px solid #064e3b;
         padding: 3px 10px;
         border-radius: 9999px;
-        font-weight: 600;
-        font-size: 0.82rem;
+        font-weight: 700;
+        font-size: 0.80rem;
         display: inline-block;
+        letter-spacing: 0.02em;
     }
     .badge-open {
-        background-color: #f0f7ff;
-        color: #0071e3;
-        border: 1px solid #cce4ff;
+        background-color: #11263c;
+        color: #38bdf8;
+        border: 1px solid #0369a1;
         padding: 2px 8px;
         border-radius: 9999px;
         font-size: 0.78rem;
         font-weight: 600;
     }
     .badge-resolved {
-        background-color: #f2faf4;
-        color: #1b8738;
-        border: 1px solid #c8eed2;
+        background-color: #0d281e;
+        color: #34d399;
+        border: 1px solid #064e3b;
         padding: 2px 8px;
         border-radius: 9999px;
         font-size: 0.78rem;
         font-weight: 600;
     }
     .badge-inprogress {
-        background-color: #fff9f0;
-        color: #b25e00;
-        border: 1px solid #ffe6c3;
+        background-color: #2b1d0c;
+        color: #fbbf24;
+        border: 1px solid #78350f;
         padding: 2px 8px;
         border-radius: 9999px;
         font-size: 0.78rem;
@@ -172,79 +218,45 @@ st.markdown("""
 
     /* Language & Translation Containers */
     .lang-pill {
-        background-color: #f5f5f7;
-        color: #1d1d1f;
+        background-color: #161921;
+        color: #f8fafc;
         padding: 3px 10px;
         border-radius: 9999px;
         font-weight: 600;
         font-size: 0.84rem;
         display: inline-block;
-        border: 1px solid #d2d2d7;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .translation-card {
-        background-color: #ffffff;
-        border: 1px solid #d2d2d7;
-        border-left: 4px solid #0071e3;
+        background-color: #14171f;
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-left: 4px solid #f97316;
         border-radius: 8px;
         padding: 14px 18px;
         margin-top: 8px;
         margin-bottom: 14px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
     }
     .translation-title {
         font-size: 0.78rem;
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #6e6e73;
+        letter-spacing: 0.06em;
+        color: #fb923c;
         margin-bottom: 4px;
     }
     .translation-body {
         font-size: 1.05rem;
         font-weight: 500;
-        color: #1d1d1f;
+        color: #f8fafc;
         line-height: 1.45;
-    }
-
-    /* Urgency Badges with Restrained Colors */
-    .badge-high {
-        background-color: #fee2e2;
-        color: #d70015;
-        border: 1px solid #fca5a5;
-        padding: 3px 8px;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        display: inline-block;
-        letter-spacing: 0.02em;
-    }
-    .badge-medium {
-        background-color: #fef3c7;
-        color: #b25e00;
-        border: 1px solid #fde68a;
-        padding: 3px 8px;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        display: inline-block;
-        letter-spacing: 0.02em;
-    }
-    .badge-low {
-        background-color: #dcfce7;
-        color: #1b8738;
-        border: 1px solid #bbf7d0;
-        padding: 3px 8px;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        display: inline-block;
-        letter-spacing: 0.02em;
     }
     
     /* Internal Staff Notes */
     .chat-bubble-internal {
-        background-color: #fffbeb;
-        color: #92400e;
-        border: 1px solid #fde68a;
+        background-color: #261c10;
+        color: #fde047;
+        border: 1px solid rgba(217, 119, 6, 0.35);
         border-left: 4px solid #d97706;
         border-radius: 8px;
         padding: 10px 14px;
@@ -255,92 +267,100 @@ st.markdown("""
 
     /* Inbox Rows */
     .inbox-card {
-        background-color: #ffffff;
-        border: 1px solid #e5e5ea;
+        background-color: #14171f;
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 10px;
         padding: 12px 14px;
         margin-bottom: 8px;
         transition: all 0.15s ease-in-out;
     }
     .inbox-card:hover {
-        border-color: #0071e3;
-        box-shadow: 0 2px 8px rgba(0, 113, 227, 0.08);
+        border-color: rgba(249, 115, 22, 0.45);
+        box-shadow: 0 4px 16px rgba(249, 115, 22, 0.15);
     }
     .inbox-card-selected {
-        background-color: #f0f7ff;
-        border: 2px solid #0071e3 !important;
+        background-color: #22160e;
+        border: 2px solid #f97316 !important;
         border-radius: 10px;
         padding: 12px 14px;
         margin-bottom: 8px;
-        box-shadow: 0 2px 8px rgba(0, 113, 227, 0.12);
+        box-shadow: 0 0 16px rgba(249, 115, 22, 0.28);
     }
     .folder-btn-active {
-        background-color: #0071e3;
+        background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
         color: #ffffff !important;
         border-radius: 8px;
         padding: 8px 12px;
         font-weight: 600;
         margin-bottom: 4px;
+        box-shadow: 0 2px 8px rgba(234, 88, 12, 0.35);
     }
     .folder-btn {
-        background-color: #f5f5f7;
-        color: #1d1d1f;
+        background-color: #161921;
+        color: #94a3b8;
         border-radius: 8px;
         padding: 8px 12px;
         font-weight: 500;
         margin-bottom: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
     /* Banners */
     .escalate-banner {
-        background-color: #fff2f2;
-        border-left: 4px solid #d70015;
+        background-color: #271416;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-left: 4px solid #ef4444;
         padding: 14px 18px;
         border-radius: 8px;
         margin-top: 10px;
         margin-bottom: 14px;
+        color: #fca5a5;
     }
     .no-escalate-banner {
-        background-color: #f2faf4;
-        border-left: 4px solid #34c759;
+        background-color: #0d261b;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        border-left: 4px solid #10b981;
         padding: 14px 18px;
         border-radius: 8px;
         margin-top: 10px;
         margin-bottom: 14px;
+        color: #86efac;
     }
     .waiting-banner {
-        background-color: #fff9f0;
-        border: 1px solid #ffe6c3;
-        border-left: 4px solid #ff9500;
+        background-color: #261b0f;
+        border: 1px solid rgba(249, 115, 22, 0.3);
+        border-left: 4px solid #f97316;
         padding: 14px 18px;
         border-radius: 8px;
         margin-top: 10px;
         margin-bottom: 14px;
+        color: #fed7aa;
     }
     .joined-banner {
-        background-color: #f0f7ff;
-        border: 1px solid #cce4ff;
-        border-left: 4px solid #0071e3;
+        background-color: #0f2130;
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        border-left: 4px solid #38bdf8;
         padding: 14px 18px;
         border-radius: 8px;
         margin-top: 10px;
         margin-bottom: 14px;
+        color: #bae6fd;
     }
 
     /* Suggested Reply Box */
     .reply-box {
-        background-color: #f5f5f7;
-        border: 1px solid #d2d2d7;
+        background-color: #14171f;
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 8px;
         padding: 16px;
-        color: #1d1d1f;
+        color: #f8fafc;
         line-height: 1.5;
         font-size: 0.95rem;
     }
 
     /* Chat Bubbles */
     .chat-bubble-customer {
-        background-color: #0071e3;
+        background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
         color: #ffffff !important;
         border-radius: 14px 14px 3px 14px;
         padding: 12px 16px;
@@ -349,28 +369,28 @@ st.markdown("""
         margin-left: auto;
         font-size: 0.95rem;
         line-height: 1.45;
-        box-shadow: 0 1px 2px rgba(0, 113, 227, 0.15);
+        box-shadow: 0 2px 8px rgba(234, 88, 12, 0.25);
     }
     .chat-bubble-customer * {
         color: #ffffff !important;
     }
     .chat-bubble-agent {
-        background-color: #f5f5f7;
-        color: #1d1d1f;
-        border: 1px solid #e5e5ea;
+        background-color: #1a1e27;
+        color: #f1f5f9;
+        border: 1px solid rgba(255, 255, 255, 0.09);
         border-radius: 14px 14px 14px 3px;
         padding: 12px 16px;
         margin: 8px 0;
         max-width: 82%;
         font-size: 0.95rem;
         line-height: 1.45;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
     }
     .chat-bubble-ai {
-        background-color: #ffffff;
-        color: #1d1d1f;
-        border: 1px solid #d2d2d7;
-        border-left: 4px solid #0071e3;
+        background-color: #151821;
+        color: #f1f5f9;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-left: 4px solid #f97316;
         border-radius: 8px;
         padding: 12px 16px;
         margin: 8px 0;
@@ -379,8 +399,9 @@ st.markdown("""
         line-height: 1.45;
     }
     .chat-bubble-system {
-        background-color: #f5f5f7;
-        color: #6e6e73;
+        background-color: #14171f;
+        color: #94a3b8;
+        border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 6px;
         padding: 6px 12px;
         margin: 6px auto;
@@ -393,20 +414,20 @@ st.markdown("""
     /* Quick phrase pill */
     .chip-btn {
         display: inline-block;
-        background: #f5f5f7;
-        border: 1px solid #d2d2d7;
+        background: #171a22;
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 16px;
         padding: 3px 10px;
         font-size: 0.82rem;
-        color: #1d1d1f;
+        color: #f8fafc;
         margin: 3px;
         cursor: pointer;
     }
     
     /* Legacy Classes for Backward Compatibility */
     .metric-card {
-        background-color: #ffffff;
-        border: 1px solid #d2d2d7;
+        background-color: #14171f;
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 10px;
         padding: 16px 20px;
         margin-bottom: 12px;
@@ -414,18 +435,18 @@ st.markdown("""
     .metric-card-title {
         font-size: 0.78rem;
         font-weight: 600;
-        color: #86868b;
+        color: #94a3b8;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.06em;
     }
     .metric-card-value {
-        font-size: 1.4rem;
-        font-weight: 600;
-        color: #1d1d1f;
+        font-size: 1.45rem;
+        font-weight: 700;
+        color: #f8fafc;
     }
     .disclaimer-text {
         font-size: 0.8rem;
-        color: #86868b;
+        color: #94a3b8;
         margin-top: 6px;
     }
 </style>
@@ -477,9 +498,9 @@ def render_login_view():
 
     # Demo Quick Access Card
     st.markdown("""
-    <div class="apple-card" style="border-left: 4px solid #0071e3;">
+    <div class="apple-card" style="border-left: 4px solid #f97316;">
         <div class="apple-card-title">Hackathon Quick Access</div>
-        <div style="font-size: 0.95rem; color: #1d1d1f; margin-bottom: 12px;">
+        <div style="font-size: 0.95rem; color: #f8fafc; margin-bottom: 12px;">
             One-click sign in to explore distinct role experiences:
         </div>
     </div>
@@ -581,8 +602,8 @@ with st.sidebar:
     st.markdown(f"""
     <div style="background: #ffffff; border: 1px solid #d2d2d7; border-radius: 10px; padding: 12px 16px; margin-bottom: 12px;">
         <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600; color: #86868b;">Logged In As</div>
-        <div style="font-size: 1.05rem; font-weight: 600; color: #1d1d1f;">{current_user['name']}</div>
-        <div style="font-size: 0.8rem; color: #0071e3; font-weight: 500;">{u_role} Account</div>
+        <div style="font-size: 1.05rem; font-weight: 600; color: #f8fafc;">{current_user['name']}</div>
+        <div style="font-size: 0.8rem; color: #f97316; font-weight: 500;">{u_role} Account</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -780,7 +801,7 @@ if current_user.get("role") == "customer":
                 st.markdown(f"""
                 <div class="apple-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <span style="font-weight: 600; font-size: 1.05rem; color: #1d1d1f;">{conv['subject']}</span>
+                        <span style="font-weight: 600; font-size: 1.05rem; color: #f8fafc;">{conv['subject']}</span>
                         <div>{st_badge} &nbsp; {urg_badge}</div>
                     </div>
                     <div style="font-size: 0.85rem; color: #6e6e73; margin-bottom: 8px;">
@@ -861,7 +882,7 @@ if current_user.get("role") == "customer":
                 elif agent_joined and assigned_name:
                     st.markdown(f"""
                     <div class="joined-banner">
-                        <strong style="color: #0071e3;">🎧 Human Specialist Joined</strong>
+                        <strong style="color: #f97316;">🎧 Human Specialist Joined</strong>
                         <div style="font-size: 0.9rem; margin-top: 4px; color: #1e3a8a;">
                             <b>{assigned_name}</b> has accepted your ticket and is actively reviewing your inquiries.
                         </div>
@@ -893,15 +914,15 @@ if current_user.get("role") == "customer":
                     elif sender == "agent":
                         st.markdown(f"""
                         <div class="chat-bubble-agent">
-                            <div style="font-size: 0.75rem; color: #0071e3; margin-bottom: 4px; font-weight: 600;">🎧 {name} (Support Specialist) &nbsp;•&nbsp; {time_str}</div>
-                            <div style="font-size: 0.98rem; color: #1d1d1f;">{msg_text}</div>
+                            <div style="font-size: 0.75rem; color: #f97316; margin-bottom: 4px; font-weight: 600;">🎧 {name} (Support Specialist) &nbsp;•&nbsp; {time_str}</div>
+                            <div style="font-size: 0.98rem; color: #f8fafc;">{msg_text}</div>
                         </div>
                         """, unsafe_allow_html=True)
                     elif sender == "ai":
                         st.markdown(f"""
                         <div class="chat-bubble-ai">
-                            <div style="font-size: 0.75rem; color: #0071e3; font-weight: 600; margin-bottom: 4px;">⚡ {name} &nbsp;•&nbsp; {time_str}</div>
-                            <div style="font-size: 0.95rem; color: #1d1d1f;">{msg_text}</div>
+                            <div style="font-size: 0.75rem; color: #f97316; font-weight: 600; margin-bottom: 4px;">⚡ {name} &nbsp;•&nbsp; {time_str}</div>
+                            <div style="font-size: 0.95rem; color: #f8fafc;">{msg_text}</div>
                         </div>
                         """, unsafe_allow_html=True)
                     elif sender == "system":
@@ -927,6 +948,10 @@ if current_user.get("role") == "customer":
                             key=f"chat_lang_{conv['id']}"
                         )
 
+                    cr_key = f"cust_reply_{conv['id']}"
+                    if f"override_{cr_key}" in st.session_state:
+                        st.session_state[cr_key] = st.session_state.pop(f"override_{cr_key}")
+
                     # Native Script Assistance Chips
                     if sel_lang in NATIVE_CHIPS:
                         st.caption(f"Quick {sel_lang} Phrase Insert:")
@@ -934,14 +959,14 @@ if current_user.get("role") == "customer":
                         for idx, (phrase, meaning) in enumerate(NATIVE_CHIPS[sel_lang]):
                             with chip_cols[idx]:
                                 if st.button(f"{phrase}", key=f"chip_{conv['id']}_{idx}", help=meaning, use_container_width=True):
-                                    st.session_state[f"cust_reply_{conv['id']}"] = phrase
+                                    st.session_state[f"override_{cr_key}"] = phrase
                                     st.rerun()
                         st.caption(f"💡 Tip: You can type in English phonetics ({'Tenglish' if sel_lang=='Telugu' else 'Tanglish' if sel_lang=='Tamil' else 'Hinglish'}) or in native {sel_lang} script directly.")
 
                     cust_reply = st.text_area(
                         "Your Message:",
                         placeholder=f"Type message in {sel_lang} or code-mixed phrasing...",
-                        key=f"cust_reply_{conv['id']}",
+                        key=cr_key,
                         height=90
                     )
 
@@ -964,7 +989,7 @@ if current_user.get("role") == "customer":
                                 # If low confidence or high urgency escalation, auto-request handoff
                                 if r_res.get("escalate") and not is_handoff:
                                     database.request_human_handoff(conv["id"], r_res.get("escalation_reason", "Escalation requested"))
-                                st.session_state[f"cust_reply_{conv['id']}"] = ""
+                                st.session_state[f"override_{cr_key}"] = ""
                                 st.success("Reply sent.")
                                 st.rerun()
 
@@ -991,7 +1016,7 @@ if current_user.get("role") == "customer":
                     if existing_fb:
                         st.markdown(f"""
                         <div class="apple-card" style="border-left: 4px solid #34c759;">
-                            <div style="font-weight: 600; font-size: 1.05rem; color: #1d1d1f; margin-bottom: 4px;">
+                            <div style="font-weight: 600; font-size: 1.05rem; color: #f8fafc; margin-bottom: 4px;">
                                 ✅ Feedback Recorded (Thank You!)
                             </div>
                             <div style="font-size: 0.95rem; color: #424245; line-height: 1.5;">
@@ -1070,6 +1095,9 @@ if current_user.get("role") == "customer":
                     key="start_lang_select"
                 )
 
+            if "override_c_start_msg" in st.session_state:
+                st.session_state["c_start_msg"] = st.session_state.pop("override_c_start_msg")
+
             # Native script helper chips
             if selected_lang in NATIVE_CHIPS:
                 st.caption(f"Click a common {selected_lang} inquiry to insert:")
@@ -1077,7 +1105,7 @@ if current_user.get("role") == "customer":
                 for idx, (phrase, meaning) in enumerate(NATIVE_CHIPS[selected_lang]):
                     with chip_cols[idx]:
                         if st.button(f"{phrase}", key=f"start_chip_{idx}", help=meaning, use_container_width=True):
-                            st.session_state["c_start_msg"] = phrase
+                            st.session_state["override_c_start_msg"] = phrase
                             st.rerun()
                 st.caption(f"💡 Typing Guide: You can type in English alphabet (e.g. {'Tenglish' if selected_lang=='Telugu' else 'Tanglish' if selected_lang=='Tamil' else 'Hinglish'}) or paste native {selected_lang} script. Both work natively.")
 
@@ -1125,7 +1153,7 @@ if current_user.get("role") == "customer":
                         # Show instant triage confirmation
                         st.markdown(f"""
                         <div class="apple-card" style="border-left: 4px solid #34c759;">
-                            <div style="font-weight: 600; font-size: 1.05rem; color: #1d1d1f; margin-bottom: 6px;">
+                            <div style="font-weight: 600; font-size: 1.05rem; color: #f8fafc; margin-bottom: 6px;">
                                 Inquiry Received & Triaged
                             </div>
                             <div style="font-size: 0.9rem; color: #424245; line-height: 1.5;">
@@ -1162,7 +1190,7 @@ if current_user.get("role") == "customer":
                 st.markdown(f"""
                 <div class="apple-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                        <span style="font-weight: 600; color: #1d1d1f; font-size: 1.05rem;">{'⭐' * f['rating']} &nbsp;•&nbsp; {f['category']}</span>
+                        <span style="font-weight: 600; color: #f8fafc; font-size: 1.05rem;">{'⭐' * f['rating']} &nbsp;•&nbsp; {f['category']}</span>
                         <span style="font-size: 0.8rem; color: #86868b;">{f['created_at'][:10]}</span>
                     </div>
                     <div style="font-size: 0.85rem; color: #6e6e73; margin-bottom: 6px;">
@@ -1424,10 +1452,10 @@ elif current_user.get("role") in ["agent", "admin"]:
                     st.markdown(f"""
                     <div class="{card_cls}">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
-                            <span style="font-weight: 700; font-size: 0.92rem; color: #1d1d1f;">{t['customer_name']}</span>
+                            <span style="font-weight: 700; font-size: 0.92rem; color: #f8fafc;">{t['customer_name']}</span>
                             <span style="font-size: 0.72rem; color: #86868b; font-weight: 500;">{time_display}</span>
                         </div>
-                        <div style="font-size: 0.83rem; color: #1d1d1f; font-weight: 500; margin-bottom: 3px;">
+                        <div style="font-size: 0.83rem; color: #f8fafc; font-weight: 500; margin-bottom: 3px;">
                             {t['subject']}
                         </div>
                         <div style="font-size: 0.78rem; color: #6e6e73; margin-bottom: 6px; font-style: italic;">
@@ -1517,7 +1545,7 @@ elif current_user.get("role") in ["agent", "admin"]:
                         st.markdown(f"""
                         <div class="metric-card" style="padding: 10px 14px;">
                             <div class="metric-card-title">Predicted Intent</div>
-                            <div style="font-size: 1.05rem; font-weight: 600; color: #1d1d1f; margin-top: 2px;">{conv['intent']}</div>
+                            <div style="font-size: 1.05rem; font-weight: 600; color: #f8fafc; margin-top: 2px;">{conv['intent']}</div>
                         </div>
                         """, unsafe_allow_html=True)
                     with m2:
@@ -1531,7 +1559,7 @@ elif current_user.get("role") in ["agent", "admin"]:
                         st.markdown(f"""
                         <div class="metric-card" style="padding: 10px 14px;">
                             <div class="metric-card-title">Calibrated Confidence</div>
-                            <div style="font-size: 1.15rem; font-weight: 700; color: #0071e3; margin-top: 2px;">{conf_pct}%</div>
+                            <div style="font-size: 1.15rem; font-weight: 700; color: #f97316; margin-top: 2px;">{conf_pct}%</div>
                         </div>
                         """, unsafe_allow_html=True)
 
@@ -1613,7 +1641,7 @@ elif current_user.get("role") in ["agent", "admin"]:
                         elif stype == "agent":
                             st.markdown(f"""
                             <div class="chat-bubble-agent">
-                                <div style="font-size: 0.75rem; color: #0071e3; margin-bottom: 2px; font-weight: 600;">🎧 {sname} (Specialist) &nbsp;•&nbsp; {t_str}</div>
+                                <div style="font-size: 0.75rem; color: #f97316; margin-bottom: 2px; font-weight: 600;">🎧 {sname} (Specialist) &nbsp;•&nbsp; {t_str}</div>
                                 {mtext}
                             </div>
                             """, unsafe_allow_html=True)
@@ -1626,7 +1654,7 @@ elif current_user.get("role") in ["agent", "admin"]:
                         else:  # AI
                             st.markdown(f"""
                             <div class="chat-bubble-ai">
-                                <div style="font-size: 0.75rem; color: #0071e3; font-weight: 600; margin-bottom: 2px;">⚡ {sname} &nbsp;•&nbsp; {t_str}</div>
+                                <div style="font-size: 0.75rem; color: #f97316; font-weight: 600; margin-bottom: 2px;">⚡ {sname} &nbsp;•&nbsp; {t_str}</div>
                                 {mtext}
                             </div>
                             """, unsafe_allow_html=True)
@@ -1637,12 +1665,18 @@ elif current_user.get("role") in ["agent", "admin"]:
                     st.markdown("##### ✍️ Agent Reply & Customer Communication")
                     target_cust_lang = conv.get("preferred_language") or conv.get("detected_language", "English")
 
+                    draft_key = f"agent_eng_draft_{conv['id']}"
+                    if f"override_{draft_key}" in st.session_state:
+                        st.session_state[draft_key] = st.session_state.pop(f"override_{draft_key}")
+
                     draft_val = conv.get("draft_reply") or "Thank you for reaching out. We are actively investigating your inquiry."
+                    if draft_key not in st.session_state:
+                        st.session_state[draft_key] = draft_val
+
                     agent_eng_draft = st.text_area(
                         "AI Suggested Draft (Editable in English):",
-                        value=draft_val,
                         height=85,
-                        key=f"agent_eng_draft_{conv['id']}"
+                        key=draft_key
                     )
 
                     # Clarification Quick Buttons
@@ -1650,31 +1684,35 @@ elif current_user.get("role") in ["agent", "admin"]:
                     qc1, qc2, qc3 = st.columns(3)
                     with qc1:
                         if st.button("📝 Order ID Request", key=f"qc_order_{conv['id']}", use_container_width=True):
-                            st.session_state[f"agent_eng_draft_{conv['id']}"] = agent_eng_draft + " Could you please provide your Order ID so we can verify the shipment immediately?"
+                            st.session_state[f"override_{draft_key}"] = agent_eng_draft + " Could you please provide your Order ID so we can verify the shipment immediately?"
                             st.rerun()
                     with qc2:
                         if st.button("📸 Damaged Photo Request", key=f"qc_photo_{conv['id']}", use_container_width=True):
-                            st.session_state[f"agent_eng_draft_{conv['id']}"] = agent_eng_draft + " Please share a clear photo of the damaged package and product to accelerate your replacement."
+                            st.session_state[f"override_{draft_key}"] = agent_eng_draft + " Please share a clear photo of the damaged package and product to accelerate your replacement."
                             st.rerun()
                     with qc3:
                         if st.button("🏦 Payment Ref Request", key=f"qc_bank_{conv['id']}", use_container_width=True):
-                            st.session_state[f"agent_eng_draft_{conv['id']}"] = agent_eng_draft + " Could you share your Bank / UPI Transaction Reference Number to trace your payment?"
+                            st.session_state[f"override_{draft_key}"] = agent_eng_draft + " Could you share your Bank / UPI Transaction Reference Number to trace your payment?"
                             st.rerun()
+
+                    final_key = f"agent_final_input_{conv['id']}"
+                    if f"override_{final_key}" in st.session_state:
+                        st.session_state[final_key] = st.session_state.pop(f"override_{final_key}")
+                    elif final_key not in st.session_state:
+                        st.session_state[final_key] = agent_eng_draft
 
                     # Translation Action
                     tr_c1, _ = st.columns([2.5, 2.5])
                     with tr_c1:
                         if st.button(f"🌐 Translate Draft to Customer Language ({target_cust_lang})", key=f"btn_tr_{conv['id']}", use_container_width=True):
                             translated_rep = ai_engine.translate_agent_reply(agent_eng_draft, target_cust_lang)
-                            st.session_state[f"agent_final_rep_{conv['id']}"] = translated_rep
+                            st.session_state[f"override_{final_key}"] = translated_rep
                             st.rerun()
 
-                    final_reply_val = st.session_state.get(f"agent_final_rep_{conv['id']}", agent_eng_draft)
                     agent_final_text = st.text_area(
                         "Final Reply to Dispatch (Review / Edit before dispatch):",
-                        value=final_reply_val,
                         height=85,
-                        key=f"agent_final_input_{conv['id']}"
+                        key=final_key
                     )
 
                     rc_col1, rc_col2 = st.columns([2, 1.5])
@@ -1704,10 +1742,14 @@ elif current_user.get("role") in ["agent", "admin"]:
                     # Internal Staff Notes Composer
                     st.markdown("<hr style='margin: 10px 0;'>", unsafe_allow_html=True)
                     st.markdown("##### 🔒 Add Internal Note (Staff Only)")
+                    note_key = f"internal_note_in_{conv['id']}"
+                    if f"override_{note_key}" in st.session_state:
+                        st.session_state[note_key] = st.session_state.pop(f"override_{note_key}")
+
                     internal_note_text = st.text_input(
                         "Internal Note (Never visible to customer):",
                         placeholder="e.g., Escalated to warehouse supervisor regarding missing courier label...",
-                        key=f"internal_note_in_{conv['id']}"
+                        key=note_key
                     )
                     if st.button("Save Internal Staff Note", key=f"btn_save_note_{conv['id']}"):
                         if internal_note_text.strip():
@@ -1717,7 +1759,7 @@ elif current_user.get("role") in ["agent", "admin"]:
                                 agent_name=current_user["name"],
                                 note_text=internal_note_text.strip()
                             )
-                            st.session_state[f"internal_note_in_{conv['id']}"] = ""
+                            st.session_state[f"override_{note_key}"] = ""
                             st.success("Internal note logged securely.")
                             st.rerun()
     # --- Page 2: Live Sessions (Phase 2 Enhanced) ---
@@ -1756,7 +1798,7 @@ elif current_user.get("role") in ["agent", "admin"]:
                     elif stype == "agent":
                         st.markdown(f"""
                         <div class="chat-bubble-agent">
-                            <div style="font-size: 0.75rem; color: #0071e3; margin-bottom: 2px; font-weight: 600;">🎧 {sname} &nbsp;•&nbsp; {t_str}</div>
+                            <div style="font-size: 0.75rem; color: #f97316; margin-bottom: 2px; font-weight: 600;">🎧 {sname} &nbsp;•&nbsp; {t_str}</div>
                             {m['message_text']}
                         </div>
                         """, unsafe_allow_html=True)
@@ -1769,7 +1811,7 @@ elif current_user.get("role") in ["agent", "admin"]:
                     else:
                         st.markdown(f"""
                         <div class="chat-bubble-ai">
-                            <div style="font-size: 0.75rem; color: #0071e3; font-weight: 600; margin-bottom: 2px;">⚡ {sname} &nbsp;•&nbsp; {t_str}</div>
+                            <div style="font-size: 0.75rem; color: #f97316; font-weight: 600; margin-bottom: 2px;">⚡ {sname} &nbsp;•&nbsp; {t_str}</div>
                             {m['message_text']}
                         </div>
                         """, unsafe_allow_html=True)
@@ -1780,12 +1822,20 @@ elif current_user.get("role") in ["agent", "admin"]:
                 cust_lang = conv.get("preferred_language") or conv.get("detected_language", "English")
                 st.markdown(f"**Compose Response (Customer preferred dialect: `{cust_lang}`)**")
                 
-                live_draft = st.text_input("Message (English or Customer's Dialect):", placeholder="e.g. We have escalated your query to our dispatch supervisor...", key=f"live_msg_{conv['id']}")
+                live_key = f"live_msg_{conv['id']}"
+                if f"override_{live_key}" in st.session_state:
+                    st.session_state[live_key] = st.session_state.pop(f"override_{live_key}")
+
+                live_draft = st.text_input(
+                    "Message (English or Customer's Dialect):",
+                    placeholder="e.g. We have escalated your query to our dispatch supervisor...",
+                    key=live_key
+                )
                 
                 tr_c1, tr_c2 = st.columns([1.5, 3])
                 with tr_c1:
                     if st.button(f"🌐 Translate to {cust_lang}", key=f"btn_live_tr_{conv['id']}"):
-                        st.session_state[f"live_msg_{conv['id']}"] = ai_engine.translate_agent_reply(live_draft, cust_lang)
+                        st.session_state[f"override_{live_key}"] = ai_engine.translate_agent_reply(live_draft, cust_lang)
                         st.rerun()
 
                 l_col1, l_col2 = st.columns([1.5, 4])
@@ -1800,7 +1850,7 @@ elif current_user.get("role") in ["agent", "admin"]:
                                 message_text=live_draft.strip()
                             )
                             database.accept_conversation(conv["id"], current_user["id"], current_user["name"])
-                            st.session_state[f"live_msg_{conv['id']}"] = ""
+                            st.session_state[f"override_{live_key}"] = ""
                             st.success("Message delivered.")
                             st.rerun()
                 with l_col2:
@@ -1844,7 +1894,7 @@ elif current_user.get("role") in ["agent", "admin"]:
             st.markdown("##### Distribution of Predicted Intents")
             if metrics["intent_distribution"]:
                 df_intent = pd.DataFrame(list(metrics["intent_distribution"].items()), columns=["Intent", "Count"]).sort_values("Count", ascending=False)
-                st.bar_chart(df_intent.set_index("Intent"), color="#0071e3")
+                st.bar_chart(df_intent.set_index("Intent"), color="#f97316")
             else:
                 st.info("No intent records available.")
 
@@ -2041,7 +2091,7 @@ elif current_user.get("role") in ["agent", "admin"]:
                     <div class="apple-card" style="padding: 14px 18px; margin-bottom: 12px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                             <div>
-                                <span style="font-weight: 700; font-size: 1.05rem; color: #1d1d1f;">{cl['name']}</span>
+                                <span style="font-weight: 700; font-size: 1.05rem; color: #f8fafc;">{cl['name']}</span>
                                 &nbsp;<span style="font-size: 0.8rem; color: #86868b;">({cl['cluster_id']})</span>
                             </div>
                             <div>
@@ -2049,14 +2099,14 @@ elif current_user.get("role") in ["agent", "admin"]:
                                 &nbsp;<span style="font-size: 0.82rem; font-weight: 600; color: #d70015; background: #fee2e2; padding: 2px 8px; border-radius: 10px;">Escalation: {cl['escalation_rate']}%</span>
                             </div>
                         </div>
-                        <div style="font-size: 0.88rem; color: #0071e3; font-weight: 600; margin-bottom: 6px;">
+                        <div style="font-size: 0.88rem; color: #f97316; font-weight: 600; margin-bottom: 6px;">
                             Theme: {cl['theme']}
                         </div>
                         <div style="display: flex; gap: 18px; font-size: 0.82rem; color: #6e6e73; margin-bottom: 8px;">
                             <span>Volume: <b>{cl['count']} complaints</b></span>
                             <span>Trend vs Baseline: <b>{cl['trend_vs_prior']}</b></span>
                         </div>
-                        <div style="background-color: #f5f5f7; border-radius: 6px; padding: 8px 12px; font-size: 0.82rem; color: #1d1d1f;">
+                        <div style="background-color: #181c24; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 8px 12px; font-size: 0.82rem; color: #f8fafc;">
                             <b>Representative Customer Excerpts:</b>
                             <ul style="margin: 4px 0 0 16px; padding: 0;">
                                 {"".join(f"<li>{quote}</li>" for quote in cl['representative_examples'])}
@@ -2078,23 +2128,23 @@ elif current_user.get("role") in ["agent", "admin"]:
             else:
                 for pat in rc_data["product_process_patterns"]:
                     st.markdown(f"""
-                    <div class="apple-card" style="padding: 14px 18px; margin-bottom: 12px; border-left: 4px solid #0071e3;">
+                    <div class="apple-card" style="padding: 14px 18px; margin-bottom: 12px; border-left: 4px solid #f97316;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <span style="font-weight: 700; font-size: 1.0rem; color: #1d1d1f;">{pat['entity']}</span>
+                            <span style="font-weight: 700; font-size: 1.0rem; color: #f8fafc;">{pat['entity']}</span>
                             <span class="lang-pill">{pat['type']} • {pat['count']} tickets</span>
                         </div>
                         <div style="margin-top: 6px; font-size: 0.88rem;">
                             <div style="margin-bottom: 4px;">
-                                <b style="color: #1d1d1f;">🔍 Observed Complaint Pattern:</b>
-                                <span style="color: #424245;"> {pat['observed_pattern']}</span>
+                                <b style="color: #f8fafc;">🔍 Observed Complaint Pattern:</b>
+                                <span style="color: #cbd5e1;"> {pat['observed_pattern']}</span>
                             </div>
                             <div style="margin-bottom: 4px;">
-                                <b style="color: #b25e00;">💡 Possible Operational Explanation:</b>
-                                <span style="color: #424245;"> {pat['possible_explanation']}</span>
+                                <b style="color: #fbbf24;">💡 Possible Operational Explanation:</b>
+                                <span style="color: #cbd5e1;"> {pat['possible_explanation']}</span>
                             </div>
                             <div>
-                                <b style="color: #1b8738;">✅ Confirmed Root Cause / Action:</b>
-                                <span style="color: #424245;"> {pat['confirmed_cause']}</span>
+                                <b style="color: #34d399;">✅ Confirmed Root Cause / Action:</b>
+                                <span style="color: #cbd5e1;"> {pat['confirmed_cause']}</span>
                             </div>
                         </div>
                     </div>
@@ -2108,9 +2158,9 @@ elif current_user.get("role") in ["agent", "admin"]:
             st.markdown("##### 📌 Emerging Issues Executive Summary")
             st.caption("Data-grounded key takeaways for customer-care managers and operations leaders:")
 
-            sum_html = "".join(f"<li style='margin-bottom: 6px; font-size: 0.92rem; color: #1d1d1f;'>{bullet}</li>" for bullet in rc_data["emerging_summary"])
+            sum_html = "".join(f"<li style='margin-bottom: 6px; font-size: 0.92rem; color: #f8fafc;'>{bullet}</li>" for bullet in rc_data["emerging_summary"])
             st.markdown(f"""
-            <div style="background-color: #fbfbfd; border: 1px solid #d2d2d7; border-radius: 10px; padding: 16px 20px;">
+            <div style="background-color: #14171f; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 16px 20px;">
                 <ul style="margin: 0; padding-left: 20px;">
                     {sum_html}
                 </ul>
