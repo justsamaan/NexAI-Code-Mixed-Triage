@@ -92,8 +92,8 @@ TAMIL_WORDS_REGEX = re.compile(
 
 HINDI_WORDS_REGEX = re.compile(
     r"\b(mera|meri|mere|mujhe|paise|paisa|do\s+baar|cut\s+gaya|nahi|nahi\s+ho\s+raha|bhai|"
-    r"kab|tak|aayegi|aayega|aaya|din|gaye|toota|toota\s+hua|nikla|chahiye|kripya|kardo|"
-    r"karna|hai|bhej|diya|badtameezi|kya|ye|phas|gaya|turant|par|se|mein|khola)\b",
+    r"kab|tak|aayegi|aayega|aaya|aaye|aayi|din|gaye|gayi|toota|toota\s+hua|nikla|chahiye|kripya|kardo|"
+    r"karna|hai|bhej|diya|badtameezi|kya|ye|phas|gaya|turant|par|se|mein|khola|deliver|hua|hue|mila|milega|mil|pahuncha)\b",
     re.IGNORECASE
 )
 
@@ -180,6 +180,23 @@ TRANSLATION_DICTIONARY = {
     "order cancel cheyyali, wrongly ordered wrong item": "I need to cancel the order, wrongly ordered the incorrect item.",
 
     # --- Hinglish ---
+    "mera order deliver nahi hua": "My order has not been delivered yet.",
+    "mera order abhi tak deliver nahi hua": "My order has not been delivered yet.",
+    "order deliver nahi hua": "The order has not been delivered yet.",
+    "mera order deliver nahi hua hai": "My order has not been delivered yet.",
+    "order deliver nahi hua hai": "The order has not been delivered yet.",
+    "mera order receive nahi hua": "My order has not been received yet.",
+    "order receive nahi hua": "The order has not been received yet.",
+    "mera order abhi tak nahi aaya": "My order has not arrived yet.",
+    "order abhi tak nahi aaya": "The order has not arrived yet.",
+    "mera package abhi tak nahi aaya": "My package has not arrived yet.",
+    "mera order nahi mila": "I have not received my order yet.",
+    "order nahi mila": "The order has not been received.",
+    "package nahi mila": "The package has not been received.",
+    "delivery nahi hui": "The delivery has not occurred / arrived yet.",
+    "delivery nahi aayi": "The delivery has not arrived yet.",
+    "order nahi pahuncha": "The order has not reached / arrived yet.",
+    "mera order nahi pahuncha": "My order has not reached / arrived yet.",
     "mera paisa do baar cut gaya": "My money was deducted two times.",
     "order mein problem hai, help me": "There is a problem with my order, help me.",
     "my login nahi ho raha, please help": "My login is not working, please help.",
@@ -310,16 +327,22 @@ def translate_to_english(message: str, detected_lang: str) -> str:
 
     # Hindi phrase replacements
     hindi_phrases = [
+        (r"mera\s+order\s+deliver\s+nahi\s+hua|order\s+deliver\s+nahi\s+hua|deliver\s+nahi\s+hua", "order has not been delivered yet"),
+        (r"delivery\s+nahi\s+hui|delivery\s+nahi\s+aayi", "delivery has not arrived yet"),
+        (r"order\s+nahi\s+pahuncha|nahi\s+pahuncha", "order has not reached / arrived yet"),
+        (r"receive\s+nahi\s+hua|nahi\s+mila|nahi\s+aaya", "not received / not arrived yet"),
+        (r"abhi\s+tak", "yet / so far"),
         (r"do\s+baar\s+cut\s+gaya", "deducted twice"),
         (r"order\s+mein\s+problem\s+hai", "there is a problem with the order"),
         (r"login\s+nahi\s+ho\s+raha", "login is not working"),
-        (r"kab\s+tak\s+aayegi", "when will it arrive"),
+        (r"kab\s+tak\s+aayegi|kab\s+aayega", "when will it arrive"),
         (r"toota\s+hua\s+nikla", "turned out broken"),
         (r"turant\s+refund\s+chahiye", "need immediate refund"),
-        (r"cancel\s+kardo", "please cancel"),
+        (r"cancel\s+kardo|cancel\s+karna", "please cancel"),
         (r"bhej\s+diya", "sent"),
         (r"mera\s+paisa|paise", "my money"),
         (r"chahiye", "need / want"),
+        (r"nahi\s+hua", "has not happened"),
     ]
 
     if detected_lang == "Telugu + English":
@@ -463,7 +486,9 @@ INTENT_PATTERNS = {
     "Delivery Delay": [
         # Hindi / Hinglish
         r"kab.*aayega", r"status.*pending", r"kab.*tak.*aayegi", r"badtameezi.*aur.*package",
-        r"din.*ho.*gaye.*status", r"डिलीवर.*नहीं", r"डिलीवरी.*लेट", r"अभी.*तक.*नहीं",
+        r"din.*ho.*gaye.*status", r"deliver.*nahi", r"nahi.*hua", r"nahi.*aaya", r"nahi.*mila",
+        r"order.*deliver.*nahi", r"order.*nahi.*mila", r"order.*nahi.*aaya",
+        r"डिलीवर.*नहीं", r"डिलीवरी.*लेट", r"अभी.*तक.*नहीं",
         # Tamil / Tanglish
         r"delivery.*late", r"romba.*late", r"late.*aagudhu", r"order.*eppo.*varum",
         r"reach.*panna.*illa", r"location.*therila", r"இன்னும்.*வரவில்லை", r"டெலிவரி.*தாமதம்",
