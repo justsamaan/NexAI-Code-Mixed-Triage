@@ -41,16 +41,38 @@ NexAI transforms customer support operations by accurately understanding, triagi
   - Resolution confirmation (`Yes`, `Partially`, `No`).
   - Strictly enforced one-review-per-conversation constraint.
 
-### B. Customer-Care Agent Workspace
-- **Agent Profile & Availability**: Live toggle between `🟢 Online`, `🟡 Busy`, and `⚪ Offline`.
-- **Language Capability Matching**: Agents declare their supported languages (e.g. Vikram handles Hindi, Telugu, and English; Anita handles Tamil and English).
-- **Specialized Workspaces**:
-  - `Customer Queries`: Central triage desk with Queue filtering (`All Authorized`, `Assigned to Me`, `Unassigned Queue`, `Awaiting Human Specialist`, `Escalated Only`), status updates, and interactive manual message analyzer.
-  - `Live Sessions`: Direct two-way messaging between agents and active customers.
-  - `Agent Reply Composer & Translator`: One-click translation of draft agent replies into the customer's preferred native language (Telugu, Tamil, Hindi) with review and edit capability before sending.
-  - `Session Analytics`: Real-time operational KPI metrics, Intent distribution chart, Urgency distribution chart, Language distribution chart, and exportable session logs.
-  - `Root-Cause Analysis`: Dedicated page diagnosing primary escalation drivers (duplicate debits, delivery delays > 48h, item damage), escalation rate by dialect, and low-confidence ambiguity cases (< 75% confidence).
-  - `🧪 Evaluation Suite`: 47 benchmark test cases running against ground-truth code-mixed datasets with confusion matrices and performance metrics.
+### B. Customer-Care Agent Workspace (Phase 3: Gmail-Inspired Ticket Inbox)
+- **Top Summary Indicators & CSAT Progress Bar**:
+  - Total received queries, resolved queries, pending queries, and active escalated flags.
+  - Interactive popover dialog detailing exact open, in-progress, resolved, and closed counts.
+  - Customer Satisfaction (CSAT) indicator with $0-100\%$ progress bar, quality badge (`Positive`, `Neutral`, `Negative`), documented formula ($\% \text{ of ratings } \ge 4\text{ stars}$), and exact sample size ($N$).
+- **Gmail-Inspired 3-Area Ticket Inbox**:
+  - **Left Folder Navigation**: 7 mailboxes with live dynamic ticket counts:
+    - 📥 Inbox
+    - 👤 Unassigned
+    - 📌 Assigned to Me
+    - ⏳ Waiting for Agent
+    - 💬 Waiting for Customer
+    - 🚨 Escalated
+    - ✅ Resolved
+  - **Main Ticket List**: Compact rows showing customer name/ID, short message preview, predicted intent, urgency indicator (restrained Red/Amber/Green), calibrated AI confidence percentage ($XX\%$, distinct from urgency), status, assigned agent, and last activity timestamp.
+  - **Details Panel**: Opens alongside the inbox list in the main workspace without losing context.
+- **Deterministic Sorting & Multidimensional Filtering**:
+  - Sorting: *Latest queries first*, *Oldest queries first*, *Highest urgency first*, *Lowest confidence first*, *Most relevant*.
+  - Filters: Intent, Urgency, Status, Dialect, Assigned Agent, and Escalation status.
+  - Search: Full-text search across customer name, ticket ID, subject, English translation, and message history.
+- **Agent Action & Resolution Controls**:
+  - Edit AI-generated draft responses in English.
+  - One-click translation of draft into customer's preferred language (Telugu, Tamil, Hindi) with review and edit before dispatch.
+  - Clarification quick-template chips (Order ID request, damage photo request, payment reference request).
+  - Takeover button to assume control of an AI-handled or unassigned conversation.
+  - Ticket assignment and reassignment dropdown.
+  - Resolution toggle: mark as resolved or reopen resolved tickets.
+  - **Internal Staff Notes**: Private staff-only notes that persist in the thread and are strictly isolated from customer views.
+- **Session Analytics (Section 7)**:
+  - Real-time tracking of active sessions, waiting customers, human handoffs, resolution counts, and average response times.
+  - Distribution charts for predicted intents and detected dialects.
+  - Customer feedback and translation quality log table.
 
 ### C. Role-Based Access Control (RBAC)
 - Strict access boundary enforced server-side. Customers can never access agent views or session data via URL parameters or navigation tampering.
@@ -62,7 +84,7 @@ NexAI transforms customer support operations by accurately understanding, triagi
 Persistent SQLite database (`data/support_platform.db`) operating in **Write-Ahead Logging (WAL)** mode with indexed querying:
 - `users`: User identity, hashed passwords, salts, roles (`customer`, `agent`, `admin`), supported languages, and availability.
 - `conversations`: Support tickets, customer IDs, subject, status (`open`, `in_progress`, `resolved`, `closed`), urgency (`high`, `medium`, `low`), detected language, English translation, predicted intent, AI confidence, escalation status, assigned agent, `preferred_language`, `handoff_requested`, and `live_agent_joined`.
-- `messages`: Chronological dialogue preserving distinction between `customer`, `agent`, `ai`, and `system` authors.
+- `messages`: Chronological dialogue preserving distinction between `customer`, `agent`, `ai`, `system`, and `internal_note` authors.
 - `feedback`: Customer ratings (1-5), categories, comments, `translation_quality`, `issue_resolved`, and assigned agent links.
 
 ---
@@ -104,7 +126,15 @@ For maximum convenience during evaluation, judges can use either:
 
 ## 6. Verification & Automated Test Results
 
-### 1. Phase 2 Platform Suite (`test_platform_phase2.py`)
+### 1. Phase 3 Platform Suite (`test_platform_phase3.py`)
+```bash
+python -m unittest test_platform_phase3.py
+```
+- **Tests run**: 8
+- **Result**: `OK` (100% pass)
+- Verifies: 7 mailbox folder counts; deterministic sorting (newest, oldest, highest urgency, lowest confidence); multidimensional filters and search; ticket assignment/reassignment; ticket resolution/reopening; internal notes customer isolation; CSAT calculation formula and sample size; resolved ticket feedback inspection.
+
+### 2. Phase 2 Platform Suite (`test_platform_phase2.py`)
 ```bash
 python -m unittest test_platform_phase2.py
 ```
@@ -112,7 +142,7 @@ python -m unittest test_platform_phase2.py
 - **Result**: `OK` (100% pass)
 - Verifies: Native Tamil, Telugu, and Hindi script detection; agent reply translation; translation uncertainty handling; human handoff & agent matching; multi-role message threading; single feedback submission constraint.
 
-### 2. Phase 1 Platform Suite (`test_platform_phase1.py`)
+### 3. Phase 1 Platform Suite (`test_platform_phase1.py`)
 ```bash
 python -m unittest test_platform_phase1.py
 ```
@@ -120,7 +150,7 @@ python -m unittest test_platform_phase1.py
 - **Result**: `OK` (100% pass)
 - Verifies: PBKDF2 password hashing & salts, customer isolation, agent language authorization, availability status updates, conversation creation & AI triage, agent reply dispatch, feedback persistence, and root-cause metrics.
 
-### 3. Application Unit Test Suite (`test_app.py`)
+### 4. Application Unit Test Suite (`test_app.py`)
 ```bash
 python -m unittest test_app.py
 ```
@@ -128,7 +158,7 @@ python -m unittest test_app.py
 - **Result**: `OK` (100% pass)
 - Verifies: Schema count, AI output contract, Telugu+English detection, English translations, original message preservation, backwards-compatibility, and AppTest flows.
 
-### 4. Code-Mixed Benchmark Evaluation Suite (`evaluate.py`)
+### 5. Code-Mixed Benchmark Evaluation Suite (`evaluate.py`)
 ```bash
 python evaluate.py
 ```
@@ -138,7 +168,7 @@ python evaluate.py
 - **Urgency Accuracy**: 100.0%
 - **Escalation Accuracy**: 100.0%
 
-### 5. Service & Subsystem Tests (`pytest tests`)
+### 6. Service & Subsystem Tests (`pytest tests`)
 ```bash
 python -m pytest tests
 ```

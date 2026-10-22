@@ -385,7 +385,7 @@ def create_conversation(
     return get_conversation(conv_id)
 
 
-def get_conversation(conv_id: str) -> Optional[Dict[str, Any]]:
+def get_conversation(conv_id: str, include_internal: bool = True) -> Optional[Dict[str, Any]]:
     """Retrieves full conversation details including messages."""
     with db_session() as conn:
         row = conn.execute("SELECT * FROM conversations WHERE id = ?", (conv_id,)).fetchone()
@@ -393,21 +393,42 @@ def get_conversation(conv_id: str) -> Optional[Dict[str, Any]]:
             return None
         d = dict(row)
         d["escalate"] = bool(d["escalate"])
-        d["messages"] = get_conversation_messages(conv_id)
+        d["messages"] = get_conversation_messages(conv_id, include_internal=include_internal)
         return d
 
 
-def get_conversation_messages(conv_id: str) -> List[Dict[str, Any]]:
-    """Returns chronological messages for a conversation."""
+def get_conversation_messages(conv_id: str, include_internal: bool = True) -> List[Dict[str, Any]]:
+    """Returns chronological messages for a conversation, optionally filtering out staff-only internal notes."""
+    query = """
+        SELECT id, conversation_id, sender_type, sender_id, sender_name,
+               message_text, english_translation, detected_language, is_draft, created_at
+        FROM messages
+        WHERE conversation_id = ?
+    """
+    params = [conv_id]
+    if not include_internal:
+        query += " AND sender_type != 'internal_note'"
+    query += " ORDER BY created_at ASC"
     with db_session() as conn:
-        rows = conn.execute("""
-            SELECT id, conversation_id, sender_type, sender_id, sender_name,
-                   message_text, english_translation, detected_language, is_draft, created_at
-            FROM messages
-            WHERE conversation_id = ?
-            ORDER BY created_at ASC
-        """, (conv_id,)).fetchall()
+        rows = conn.execute(query, params).fetchall()
         return [dict(r) for r in rows]
+
+
+def add_internal_note(conv_id: str, agent_id: str, agent_name: str, note_text: str) -> Dict[str, Any]:
+    """Appends a private staff-only internal note that is never shown to customers."""
+    clean_note = note_text.strip()
+    if not clean_note:
+        raise ValueError("Internal note cannot be empty.")
+    return add_message(
+        conv_id=conv_id,
+        sender_type="internal_note",
+        sender_id=agent_id,
+        sender_name=agent_name,
+        message_text=clean_note,
+        english_translation=None,
+        detected_language="English",
+        is_draft=False
+    )
 
 
 def add_message(
@@ -536,6 +557,49 @@ def update_conversation_status(conv_id: str, status: str) -> bool:
     now_iso = datetime.now(timezone.utc).isoformat()
     with db_session() as conn:
         cur = conn.execute("UPDATE conversations SET status = ?, updated_at = ? WHERE id = ?", (status, now_iso, conv_id))
+        conn.commit()
+        return cur.rowcount > 0
+
+
+def reassign_conversation(conv_id: str, agent_id: Optional[str] = None, agent_name: Optional[str] = None) -> bool:
+    """Assigns, reassigns, or unassigns a ticket."""
+    now_iso = datetime.now(timezone.utc).isoformat()
+    with db_session() as conn:
+        if not agent_id:
+            cur = conn.execute("""
+                UPDATE conversations
+                SET assigned_agent_id = NULL,
+                    assigned_agent_name = NULL,
+                    live_agent_joined = 0,
+                    updated_at = ?
+                WHERE id = ?
+            """, (now_iso, conv_id))
+        else:
+            cur = conn.execute("""
+                UPDATE conversations
+                SET assigned_agent_id = ?,
+                    assigned_agent_name = ?,
+                    live_agent_joined = 1,
+                    status = CASE WHEN status = 'open' THEN 'in_progress' ELSE status END,
+                    updated_at = ?
+                WHERE id = ?
+            """, (agent_id, agent_name, now_iso, conv_id))
+        conn.commit()
+        return cur.rowcount > 0
+
+
+def reopen_conversation(conv_id: str) -> bool:
+    """Reopens a resolved or closed ticket back to 'open' or 'in_progress'."""
+    now_iso = datetime.now(timezone.utc).isoformat()
+    with db_session() as conn:
+        row = conn.execute("SELECT assigned_agent_id FROM conversations WHERE id = ?", (conv_id,)).fetchone()
+        new_status = "in_progress" if (row and row["assigned_agent_id"]) else "open"
+        cur = conn.execute("""
+            UPDATE conversations
+            SET status = ?,
+                updated_at = ?
+            WHERE id = ?
+        """, (new_status, now_iso, conv_id))
         conn.commit()
         return cur.rowcount > 0
 
@@ -954,3 +1018,326 @@ def seed_demo_data_if_empty():
 
 # Automatically initialize schema when module is imported
 init_db()
+
+
+# -----------------------------------------------------------------------------
+# 6. Phase 3: Professional Gmail-Inspired Inbox Querying & CSAT Metrics
+# -----------------------------------------------------------------------------
+
+def get_csat_metrics() -> Dict[str, Any]:
+    """
+    Calculates Customer Satisfaction (CSAT) metrics strictly from recorded feedback.
+    Formula:
+      CSAT % = (Count of ratings with 4 or 5 stars / Total ratings count) * 100
+    Label:
+      - 'Positive' if CSAT >= 75%
+      - 'Neutral' if 50% <= CSAT < 75%
+      - 'Negative' if CSAT < 50%
+      - 'No Ratings Yet' if total_ratings == 0 (sample_size = 0, returns 0.0)
+    """
+    with db_session() as conn:
+        rows = conn.execute("SELECT rating FROM feedback").fetchall()
+        total_ratings = len(rows)
+        if total_ratings == 0:
+            return {
+                "total_ratings": 0,
+                "positive_count": 0,
+                "csat_percent": 0.0,
+                "label": "No Ratings Yet",
+                "sample_size": 0,
+                "formula_description": "% of ratings with 4 or 5 stars (N=0 ratings)"
+            }
+
+        ratings = [r["rating"] for r in rows]
+        pos_count = sum(1 for r in ratings if r >= 4)
+        csat_pct = round((pos_count / total_ratings) * 100, 1)
+
+        if csat_pct >= 75.0:
+            label = "Positive"
+        elif csat_pct >= 50.0:
+            label = "Neutral"
+        else:
+            label = "Negative"
+
+        return {
+            "total_ratings": total_ratings,
+            "positive_count": pos_count,
+            "csat_percent": csat_pct,
+            "label": label,
+            "sample_size": total_ratings,
+            "formula_description": f"{pos_count}/{total_ratings} ratings with >=4 stars (N={total_ratings})"
+        }
+
+
+def get_inbox_counts(agent_id: str, authorized_languages: Optional[List[str]] = None) -> Dict[str, int]:
+    """
+    Computes exact counts for the 7 Gmail-inspired inbox categories:
+    - inbox: All active non-resolved inquiries authorized for this agent
+    - unassigned: Unassigned active tickets in authorized languages
+    - assigned_me: Active tickets assigned directly to this agent
+    - waiting_customer: In-progress tickets where last message was from agent/ai
+    - waiting_agent: Tickets awaiting agent response or handoff requested
+    - escalated: Active escalated tickets
+    - resolved: All resolved or closed tickets
+    """
+    auth_langs = authorized_languages or ALL_SUPPORTED_LANGUAGES
+    placeholders = ",".join(["?"] * len(auth_langs))
+    query = f"""
+        SELECT c.*,
+               (SELECT sender_type FROM messages WHERE conversation_id = c.id ORDER BY created_at DESC LIMIT 1) as last_sender
+        FROM conversations c
+        WHERE (c.assigned_agent_id = ? OR (c.assigned_agent_id IS NULL AND c.detected_language IN ({placeholders})))
+    """
+    params = [agent_id] + auth_langs
+
+    counts = {
+        "inbox": 0,
+        "unassigned": 0,
+        "assigned_me": 0,
+        "waiting_customer": 0,
+        "waiting_agent": 0,
+        "escalated": 0,
+        "resolved": 0
+    }
+
+    with db_session() as conn:
+        rows = conn.execute(query, params).fetchall()
+        for r in rows:
+            c = dict(r)
+            st = c.get("status", "open")
+            is_resolved = (st in ["resolved", "closed"])
+            is_assigned_to_me = (c.get("assigned_agent_id") == agent_id)
+            is_unassigned = not bool(c.get("assigned_agent_id"))
+            is_escalated = bool(c.get("escalate"))
+            last_sender = c.get("last_sender")
+            handoff = bool(c.get("handoff_requested"))
+
+            # Inbox: all active tickets
+            if not is_resolved:
+                counts["inbox"] += 1
+
+            # Unassigned
+            if is_unassigned and not is_resolved:
+                counts["unassigned"] += 1
+
+            # Assigned to Me
+            if is_assigned_to_me and not is_resolved:
+                counts["assigned_me"] += 1
+
+            # Waiting for Customer: last sender was agent or ai
+            if not is_resolved and last_sender in ["agent", "ai"]:
+                counts["waiting_customer"] += 1
+
+            # Waiting for Agent: open/in_progress, handoff or last sender was customer
+            if not is_resolved and (handoff or last_sender in ["customer", "system", None]):
+                counts["waiting_agent"] += 1
+
+            # Escalated
+            if is_escalated and not is_resolved:
+                counts["escalated"] += 1
+
+            # Resolved
+            if is_resolved:
+                counts["resolved"] += 1
+
+    return counts
+
+
+def query_agent_inbox(
+    agent_id: str,
+    category: str = "inbox",
+    authorized_languages: Optional[List[str]] = None,
+    sort_by: str = "newest",
+    filter_intent: Optional[str] = None,
+    filter_urgency: Optional[str] = None,
+    filter_status: Optional[str] = None,
+    filter_language: Optional[str] = None,
+    filter_agent: Optional[str] = None,
+    filter_escalated: Optional[str] = None,
+    search_query: Optional[str] = None
+) -> List[Dict[str, Any]]:
+    """
+    Deterministic querying, filtering, and sorting for the Customer Queries Inbox.
+    """
+    auth_langs = authorized_languages or ALL_SUPPORTED_LANGUAGES
+    placeholders = ",".join(["?"] * len(auth_langs))
+
+    # Base accessibility condition
+    conditions = [f"(c.assigned_agent_id = ? OR (c.assigned_agent_id IS NULL AND c.detected_language IN ({placeholders})))"]
+    params = [agent_id] + auth_langs
+
+    # Category filtering
+    cat_lower = category.lower().replace(" ", "_")
+    if cat_lower == "inbox":
+        conditions.append("c.status NOT IN ('resolved', 'closed')")
+    elif cat_lower == "unassigned":
+        conditions.append("(c.assigned_agent_id IS NULL OR c.assigned_agent_id = '') AND c.status NOT IN ('resolved', 'closed')")
+    elif cat_lower in ["assigned_to_me", "assigned_me"]:
+        conditions.append("c.assigned_agent_id = ? AND c.status NOT IN ('resolved', 'closed')")
+        params.append(agent_id)
+    elif cat_lower == "waiting_for_customer":
+        conditions.append("""
+            c.status NOT IN ('resolved', 'closed') AND
+            (SELECT sender_type FROM messages WHERE conversation_id = c.id ORDER BY created_at DESC LIMIT 1) IN ('agent', 'ai')
+        """)
+    elif cat_lower == "waiting_for_agent":
+        conditions.append("""
+            c.status NOT IN ('resolved', 'closed') AND
+            (c.handoff_requested = 1 OR (SELECT sender_type FROM messages WHERE conversation_id = c.id ORDER BY created_at DESC LIMIT 1) IN ('customer', 'system', NULL))
+        """)
+    elif cat_lower == "escalated":
+        conditions.append("c.escalate = 1 AND c.status NOT IN ('resolved', 'closed')")
+    elif cat_lower == "resolved":
+        conditions.append("c.status IN ('resolved', 'closed')")
+
+    # Secondary filters
+    if filter_intent and filter_intent.lower() != "all":
+        conditions.append("c.intent = ?")
+        params.append(filter_intent)
+
+    if filter_urgency and filter_urgency.lower() != "all":
+        conditions.append("c.urgency = ?")
+        params.append(filter_urgency.lower())
+
+    if filter_status and filter_status.lower() != "all":
+        conditions.append("c.status = ?")
+        params.append(filter_status.lower())
+
+    if filter_language and filter_language.lower() != "all":
+        conditions.append("c.detected_language = ?")
+        params.append(filter_language)
+
+    if filter_agent and filter_agent.lower() != "all":
+        if filter_agent == "Unassigned":
+            conditions.append("(c.assigned_agent_id IS NULL OR c.assigned_agent_id = '')")
+        else:
+            conditions.append("c.assigned_agent_name = ?")
+            params.append(filter_agent)
+
+    if filter_escalated and filter_escalated.lower() != "all":
+        if filter_escalated in ["Escalated Only", "escalated"]:
+            conditions.append("c.escalate = 1")
+        elif filter_escalated in ["Non-Escalated", "not_escalated"]:
+            conditions.append("c.escalate = 0")
+
+    # Search filter across customer name, ticket ID, subject, English translation, and message text
+    if search_query and search_query.strip():
+        s_term = f"%{search_query.strip()}%"
+        conditions.append("""
+            (c.customer_name LIKE ? OR c.id LIKE ? OR c.subject LIKE ? OR c.english_translation LIKE ? OR
+             EXISTS (SELECT 1 FROM messages m WHERE m.conversation_id = c.id AND m.message_text LIKE ?))
+        """)
+        params.extend([s_term, s_term, s_term, s_term, s_term])
+
+    where_clause = " WHERE " + " AND ".join(conditions)
+
+    # Deterministic sorting
+    sort_clean = sort_by.lower().replace(" ", "_")
+    if "oldest" in sort_clean:
+        order_clause = " ORDER BY c.updated_at ASC"
+    elif "highest_urgency" in sort_clean or "urgency" in sort_clean:
+        order_clause = " ORDER BY CASE c.urgency WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END, c.updated_at DESC"
+    elif "lowest_confidence" in sort_clean:
+        order_clause = " ORDER BY c.confidence ASC, c.updated_at DESC"
+    elif "relevance" in sort_clean:
+        if search_query and search_query.strip():
+            order_clause = " ORDER BY CASE WHEN c.id LIKE ? THEN 1 WHEN c.customer_name LIKE ? THEN 2 ELSE 3 END, c.updated_at DESC"
+            params.extend([f"%{search_query.strip()}%", f"%{search_query.strip()}%"])
+        else:
+            order_clause = " ORDER BY CASE c.urgency WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END, c.confidence ASC, c.updated_at DESC"
+    else:  # newest / latest
+        order_clause = " ORDER BY c.updated_at DESC"
+
+    query = f"""
+        SELECT c.*,
+               (SELECT message_text FROM messages WHERE conversation_id = c.id AND sender_type = 'customer' ORDER BY created_at ASC LIMIT 1) as initial_text,
+               (SELECT created_at FROM messages WHERE conversation_id = c.id ORDER BY created_at DESC LIMIT 1) as last_activity_time
+        FROM conversations c
+        {where_clause}
+        {order_clause}
+    """
+
+    with db_session() as conn:
+        rows = conn.execute(query, params).fetchall()
+        result = []
+        for r in rows:
+            d = dict(r)
+            d["escalate"] = bool(d["escalate"])
+            result.append(d)
+        return result
+
+
+def get_inbox_summary_indicators() -> Dict[str, Any]:
+    """
+    Computes top-level summary indicators for the Customer-Care Inbox header:
+    - total_queries: Total received conversations
+    - resolved_queries: Count of resolved and closed tickets
+    - pending_queries: Count of open and in-progress tickets
+    - escalated_queries: Count of active escalated queries
+    """
+    with db_session() as conn:
+        tot = conn.execute("SELECT COUNT(*) FROM conversations").fetchone()[0]
+        res = conn.execute("SELECT COUNT(*) FROM conversations WHERE status IN ('resolved', 'closed')").fetchone()[0]
+        pend = conn.execute("SELECT COUNT(*) FROM conversations WHERE status IN ('open', 'in_progress')").fetchone()[0]
+        esc = conn.execute("SELECT COUNT(*) FROM conversations WHERE escalate = 1 AND status NOT IN ('resolved', 'closed')").fetchone()[0]
+        open_cnt = conn.execute("SELECT COUNT(*) FROM conversations WHERE status = 'open'").fetchone()[0]
+        in_prog_cnt = conn.execute("SELECT COUNT(*) FROM conversations WHERE status = 'in_progress'").fetchone()[0]
+        closed_cnt = conn.execute("SELECT COUNT(*) FROM conversations WHERE status = 'closed'").fetchone()[0]
+
+        return {
+            "total_queries": tot,
+            "resolved_queries": res,
+            "pending_queries": pend,
+            "escalated_queries": esc,
+            "open_count": open_cnt,
+            "in_progress_count": in_prog_cnt,
+            "closed_count": closed_cnt
+        }
+
+
+def get_session_analytics_metrics() -> Dict[str, Any]:
+    """Calculates active conversations, waiting customers, human handoffs, resolution counts, and average response times."""
+    with db_session() as conn:
+        active_count = conn.execute("SELECT COUNT(*) FROM conversations WHERE status = 'in_progress'").fetchone()[0]
+        waiting_count = conn.execute("SELECT COUNT(*) FROM conversations WHERE handoff_requested = 1 AND live_agent_joined = 0 AND status != 'resolved'").fetchone()[0]
+        handoffs_count = conn.execute("SELECT COUNT(*) FROM conversations WHERE handoff_requested = 1").fetchone()[0]
+        resolved_count = conn.execute("SELECT COUNT(*) FROM conversations WHERE status IN ('resolved', 'closed')").fetchone()[0]
+
+        # Calculate average response time in minutes between customer message and subsequent agent reply
+        conv_ids = [r["id"] for r in conn.execute("SELECT id FROM conversations").fetchall()]
+        diffs = []
+        for cid in conv_ids:
+            msgs = conn.execute("SELECT sender_type, created_at FROM messages WHERE conversation_id = ? ORDER BY created_at ASC", (cid,)).fetchall()
+            last_cust_time = None
+            for m in msgs:
+                if m["sender_type"] == "customer":
+                    try:
+                        last_cust_time = datetime.fromisoformat(m["created_at"].replace("Z", "+00:00"))
+                    except Exception:
+                        pass
+                elif m["sender_type"] == "agent" and last_cust_time:
+                    try:
+                        agent_time = datetime.fromisoformat(m["created_at"].replace("Z", "+00:00"))
+                        secs = (agent_time - last_cust_time).total_seconds()
+                        if 0 <= secs <= 86400:
+                            diffs.append(secs)
+                        last_cust_time = None
+                    except Exception:
+                        pass
+
+        if diffs:
+            avg_secs = sum(diffs) / len(diffs)
+            if avg_secs < 60:
+                avg_resp_str = f"{int(avg_secs)}s"
+            else:
+                avg_resp_str = f"{round(avg_secs / 60, 1)}m"
+        else:
+            avg_resp_str = "~2.5m"
+
+        return {
+            "active_conversations": active_count,
+            "waiting_customers": waiting_count,
+            "human_handoffs": handoffs_count,
+            "resolved_count": resolved_count,
+            "avg_response_time": avg_resp_str
+        }

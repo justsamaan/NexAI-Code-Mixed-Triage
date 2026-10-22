@@ -205,6 +205,92 @@ st.markdown("""
         line-height: 1.45;
     }
 
+    /* Urgency Badges with Restrained Colors */
+    .badge-high {
+        background-color: #fee2e2;
+        color: #d70015;
+        border: 1px solid #fca5a5;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: inline-block;
+        letter-spacing: 0.02em;
+    }
+    .badge-medium {
+        background-color: #fef3c7;
+        color: #b25e00;
+        border: 1px solid #fde68a;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: inline-block;
+        letter-spacing: 0.02em;
+    }
+    .badge-low {
+        background-color: #dcfce7;
+        color: #1b8738;
+        border: 1px solid #bbf7d0;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: inline-block;
+        letter-spacing: 0.02em;
+    }
+    
+    /* Internal Staff Notes */
+    .chat-bubble-internal {
+        background-color: #fffbeb;
+        color: #92400e;
+        border: 1px solid #fde68a;
+        border-left: 4px solid #d97706;
+        border-radius: 8px;
+        padding: 10px 14px;
+        margin: 8px 0;
+        font-size: 0.90rem;
+        line-height: 1.45;
+    }
+
+    /* Inbox Rows */
+    .inbox-card {
+        background-color: #ffffff;
+        border: 1px solid #e5e5ea;
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 8px;
+        transition: all 0.15s ease-in-out;
+    }
+    .inbox-card:hover {
+        border-color: #0071e3;
+        box-shadow: 0 2px 8px rgba(0, 113, 227, 0.08);
+    }
+    .inbox-card-selected {
+        background-color: #f0f7ff;
+        border: 2px solid #0071e3 !important;
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 8px;
+        box-shadow: 0 2px 8px rgba(0, 113, 227, 0.12);
+    }
+    .folder-btn-active {
+        background-color: #0071e3;
+        color: #ffffff !important;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+    .folder-btn {
+        background-color: #f5f5f7;
+        color: #1d1d1f;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+
     /* Banners */
     .escalate-banner {
         background-color: #fff2f2;
@@ -736,7 +822,7 @@ if current_user.get("role") == "customer":
 
             selected_id = conv_options[selected_label]
             st.session_state["selected_conv_id"] = selected_id
-            conv = database.get_conversation(selected_id)
+            conv = database.get_conversation(selected_id, include_internal=False)
 
             if conv:
                 st.markdown("<br>", unsafe_allow_html=True)
@@ -793,7 +879,9 @@ if current_user.get("role") == "customer":
                     msg_text = msg.get("message_text", "")
                     trans = msg.get("english_translation")
                     
-                    if sender == "customer":
+                    if sender == "internal_note":
+                        continue
+                    elif sender == "customer":
                         trans_html = f'<div style="font-size: 0.8rem; opacity: 0.9; margin-top: 4px; font-style: italic; border-top: 1px solid rgba(255,255,255,0.25); padding-top: 4px;">English meaning: "{trans}"</div>' if trans and trans != msg_text else ''
                         st.markdown(f"""
                         <div class="chat-bubble-customer">
@@ -1093,21 +1181,61 @@ if current_user.get("role") == "customer":
 
 elif current_user.get("role") in ["agent", "admin"]:
 
-    # --- Page 1: Customer Queries (Triage & Ticket Console) ---
+    # --- Page 1: Customer Queries (Triage & Gmail-Inspired Ticket Workspace) ---
     if section == "Customer Queries":
-        st.markdown('<div class="apple-header">Customer Queries & Triage Desk</div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="apple-sub">Active triage console for {current_user["name"]}. Filtered by your authorized dialects: <b>{", ".join(current_user.get("languages", []))}</b></div>', unsafe_allow_html=True)
+        st.markdown('<div class="apple-header">Customer-Care Inbox & Triage Desk</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="apple-sub">Unified Gmail-inspired ticket inbox for {current_user["name"]}. Authorized dialects: <b>{", ".join(current_user.get("languages", []))}</b></div>', unsafe_allow_html=True)
 
-        # 1. Live Code-Mixed Message Analyzer (Top Priority Triage Tool)
-        with st.container():
+        # ---------------------------------------------------------------------
+        # 1. Summary Indicators & CSAT Progress Bar (Top Header)
+        # ---------------------------------------------------------------------
+        indicators = database.get_inbox_summary_indicators()
+        csat = database.get_csat_metrics()
+
+        sum_c1, sum_c2, sum_c3, sum_c4, sum_c5 = st.columns([1.5, 1.5, 1.5, 1.5, 2.5])
+        with sum_c1:
+            st.metric("Total Received", indicators["total_queries"])
+        with sum_c2:
+            st.metric("Resolved", indicators["resolved_queries"])
+        with sum_c3:
+            st.metric("Pending", indicators["pending_queries"])
+        with sum_c4:
+            st.metric("Escalated", indicators["escalated_queries"])
+        with sum_c5:
+            # CSAT Metric with Progress Bar and Documented Formula
+            csat_score = csat["csat_percent"]
+            csat_lbl = csat["label"]
+            csat_badge = "🟢" if csat_lbl == "Positive" else ("🟡" if csat_lbl == "Neutral" else "⚪")
+            st.markdown(f"**Customer Satisfaction:** {csat_score}% {csat_badge}")
+            st.progress(csat_score / 100.0)
+            st.caption(f"Rating Quality: **{csat_lbl}** • Sample: **N={csat['sample_size']}** ({csat['formula_description']})")
+
+        # Small dialog / popover showing exact breakdown
+        with st.popover("📊 Detailed Status Breakdown"):
+            st.markdown("#### Exact Ticket Status Breakdown")
+            st.markdown(f"- **Total Inquiries Received:** `{indicators['total_queries']}`")
+            st.markdown(f"- **Open (Pending Triage):** `{indicators['open_count']}`")
+            st.markdown(f"- **In Progress (Specialist Assigned):** `{indicators['in_progress_count']}`")
+            st.markdown(f"- **Resolved Inquiries:** `{indicators['resolved_queries']}`")
+            st.markdown(f"- **Closed Archives:** `{indicators['closed_count']}`")
+            st.markdown(f"- **Active Escalated Flags:** `{indicators['escalated_queries']}`")
+            st.caption("All figures calculated from persistent SQLite storage.")
+
+        st.divider()
+
+        # ---------------------------------------------------------------------
+        # 2. Live Code-Mixed Message Analyzer (Top Priority Triage Tool)
+        # MUST REMAIN FIRST TEXT_AREA FOR UNIT TEST COMPATIBILITY
+        # ---------------------------------------------------------------------
+        with st.expander("⚡ Ad-Hoc Code-Mixed Message Analyzer", expanded=bool(st.session_state.get("message_input_val"))):
             input_text = st.text_area(
                 "Customer Message (Telugu+English, Hinglish, Tanglish, or English):",
                 value=st.session_state["message_input_val"],
-                height=110,
+                height=90,
                 placeholder="Type or paste customer inquiry here, e.g., 'refund kavali, amount account lo padaledu' or 'mera paisa do baar cut gaya'...",
                 key="ticket_input_field"
             )
-            
+
             btn_col1, btn_col2, _ = st.columns([1.5, 1, 4])
             with btn_col1:
                 analyze_clicked = st.button("🔍 Analyze Message", type="primary", use_container_width=True)
@@ -1132,7 +1260,7 @@ elif current_user.get("role") in ["agent", "admin"]:
                             result["confidence"] = conf
                             detected_lang = result.get("detected_language", "Mixed/Unclear")
                             english_trans = result.get("english_translation", clean_msg)
-                            
+
                             ticket_entry = {
                                 "id": len(st.session_state["tickets"]) + 1,
                                 "timestamp": datetime.datetime.now().strftime("%H:%M:%S"),
@@ -1153,237 +1281,445 @@ elif current_user.get("role") in ["agent", "admin"]:
                             st.error(f"Failed to process message: {str(e)}")
                 st.rerun()
 
-        # Display Live Analysis Result
-        latest = st.session_state["latest_result"]
-        if latest:
-            st.divider()
-            st.markdown("#### 📋 Triage Assessment")
-            st.markdown(f"**Original Message:** *\"{latest['message']}\"*")
-            st.markdown(f"""
-            <div style="margin: 8px 0;">
-                <span style="font-weight: 600; color: #6e6e73; font-size: 0.9rem;">Detected Dialect:</span>
-                <span class="lang-pill">🌐 {latest.get('detected_language', '—')}</span>
-            </div>
-            """, unsafe_allow_html=True)
-
-            st.markdown(f"""
-            <div class="translation-card">
-                <div class="translation-title">🔤 English Translation</div>
-                <div class="translation-body">{latest.get('english_translation', '—')}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-            c1, c2, c3 = st.columns(3)
-            with c1:
-                st.markdown(f"""
-                <div class="metric-card">
-                    <div class="metric-card-title">Predicted Intent</div>
-                    <div class="metric-card-value">{latest['intent']}</div>
-                </div>
-                """, unsafe_allow_html=True)
-            with c2:
-                urg = str(latest['urgency']).lower()
-                st.markdown(f"""
-                <div class="metric-card">
-                    <div class="metric-card-title">Urgency Level</div>
-                    <div class="metric-card-value"><span class="badge-{urg}">{str(latest['urgency']).upper()}</span></div>
-                </div>
-                """, unsafe_allow_html=True)
-            with c3:
-                conf_pct = int(float(latest['confidence']) * 100)
-                st.markdown(f"""
-                <div class="metric-card">
-                    <div class="metric-card-title">Confidence Score</div>
-                    <div class="metric-card-value">{conf_pct}% ({latest['confidence']})</div>
-                </div>
-                """, unsafe_allow_html=True)
-
-            st.markdown("#### Suggested Customer Reply (Draft)")
-            st.markdown(f"""
-            <div class="reply-box">
-                {latest['draft_reply']}
-            </div>
-            """, unsafe_allow_html=True)
-            st.markdown('<div class="disclaimer-text">🔒 Note: Suggested responses are drafts and are never dispatched automatically.</div>', unsafe_allow_html=True)
-
-            if latest["escalate"]:
-                st.markdown(f"""
-                <div class="escalate-banner">
-                    <strong style="color: #d70015; font-size: 1.05rem;">🚨 ESCALATION REQUIRED</strong>
-                    <div style="margin-top: 4px; color: #4c0519;"><b>Reason:</b> {latest['escalation_reason']}</div>
-                </div>
-                """, unsafe_allow_html=True)
-            else:
-                st.markdown("""
-                <div class="no-escalate-banner">
-                    <strong style="color: #1b8738; font-size: 1.05rem;">✅ NO ESCALATION NEEDED</strong>
-                    <div style="margin-top: 4px; color: #14532d;">Routine query manageable via Tier-1 workflow.</div>
-                </div>
-                """, unsafe_allow_html=True)
+            # Display Live Analysis Result if present
+            latest = st.session_state["latest_result"]
+            if latest:
+                st.markdown("#### 📋 Ad-Hoc Assessment")
+                orig_m = latest.get("message", "")
+                st.markdown(f"**Original:** *\"{orig_m}\"* &nbsp;•&nbsp; **Dialect:** <span class='lang-pill'>{latest.get('detected_language')}</span>", unsafe_allow_html=True)
+                st.markdown(f"**Translation:** {latest.get('english_translation')}")
+                lac1, lac2, lac3 = st.columns(3)
+                lac1.metric("Predicted Intent", latest["intent"])
+                lac2.metric("Urgency Level", latest["urgency"].upper())
+                lac3.metric("AI Confidence", f"{int(latest['confidence'] * 100)}%")
+                if latest["escalate"]:
+                    st.warning(f"🚨 Escalation Flag: {latest.get('escalation_reason')}")
 
         st.divider()
 
-        # 2. Queue of Authorized Inquiries & Inspector
-        st.markdown("### 📋 Authorized Customer Inquiries Queue")
-
-        # Filters
-        f_col1, f_col2, f_col3 = st.columns([2, 2, 2])
-        with f_col1:
-            q_view = st.selectbox("Queue Filter", ["All Authorized Inquiries", "Awaiting Human Specialist", "Assigned to Me", "Unassigned Inquiries", "Escalated Only"])
-        with f_col2:
-            st_filter = st.selectbox("Status Filter", ["All", "open", "in_progress", "resolved"])
-        with f_col3:
-            lang_filter = st.selectbox("Dialect Filter", ["All Languages"] + database.ALL_SUPPORTED_LANGUAGES)
-
-        # Fetch tickets from persistent DB
-        only_assigned = (q_view == "Assigned to Me")
+        # ---------------------------------------------------------------------
+        # 3. Three-Area Gmail-Inspired Workspace
+        # AREA 1: Left Folder Navigation Sidebar
+        # AREA 2: Main Ticket List with Compact Rows & Sorting
+        # AREA 3: Details Panel & Agent Reply Controls
+        # ---------------------------------------------------------------------
         auth_langs = current_user.get("languages", database.ALL_SUPPORTED_LANGUAGES)
-        tickets = database.list_agent_conversations(
-            agent_id=current_user["id"],
-            authorized_languages=auth_langs if q_view != "Assigned to Me" else None,
-            status_filter=st_filter if st_filter != "All" else None,
-            assigned_only=only_assigned
-        )
+        folder_counts = database.get_inbox_counts(agent_id=current_user["id"], authorized_languages=auth_langs)
 
-        if q_view == "Awaiting Human Specialist":
-            tickets = [t for t in tickets if t.get("handoff_requested")]
-        elif q_view == "Unassigned Inquiries":
-            tickets = [t for t in tickets if not t.get("assigned_agent_id")]
-        elif q_view == "Escalated Only":
-            tickets = [t for t in tickets if t.get("escalate")]
+        # 3 Main Areas Layout
+        area1_col, area2_col, area3_col = st.columns([1.1, 2.0, 2.9])
 
-        if lang_filter != "All Languages":
-            tickets = [t for t in tickets if t.get("detected_language") == lang_filter]
+        # =====================================================================
+        # AREA 1: LEFT FOLDER NAVIGATION SIDEBAR
+        # =====================================================================
+        with area1_col:
+            st.markdown("##### 📁 Mailboxes")
+            folder_map = {
+                f"📥 Inbox ({folder_counts['inbox']})": "inbox",
+                f"👤 Unassigned ({folder_counts['unassigned']})": "unassigned",
+                f"📌 Assigned to Me ({folder_counts['assigned_me']})": "assigned_me",
+                f"⏳ Waiting for Agent ({folder_counts['waiting_agent']})": "waiting_for_agent",
+                f"💬 Waiting for Customer ({folder_counts['waiting_customer']})": "waiting_for_customer",
+                f"🚨 Escalated ({folder_counts['escalated']})": "escalated",
+                f"✅ Resolved ({folder_counts['resolved']})": "resolved"
+            }
 
-        st.markdown(f"**Showing {len(tickets)} customer ticket(s)**")
+            folder_keys = list(folder_map.keys())
+            current_f_idx = 0
+            curr_folder = st.session_state.get("inbox_active_folder", "inbox")
+            for idx, (label, val) in enumerate(folder_map.items()):
+                if val == curr_folder:
+                    current_f_idx = idx
+                    break
 
-        # Ticket Selection and Action Pane
-        if tickets:
-            t_col_list, t_col_detail = st.columns([2.2, 2.8])
-            
-            with t_col_list:
-                for t in tickets:
-                    urg_cls = f"badge-{t['urgency'].lower()}"
-                    esc_badge = '<span class="badge-high" style="font-size:0.75rem;">ESCALATED</span>' if t['escalate'] else ''
-                    wait_badge = '<span class="badge-medium" style="font-size:0.75rem;">AWAITING AGENT</span>' if t.get('handoff_requested') and not t.get('live_agent_joined') else ''
-                    is_sel = (st.session_state["selected_conv_id"] == t["id"])
-                    sel_border = "border: 2px solid #0071e3;" if is_sel else "border: 1px solid #d2d2d7;"
-                    
+            active_f_val = st.session_state.get("inbox_active_folder", "inbox")
+            for flabel, fval in folder_map.items():
+                is_curr = (fval == active_f_val)
+                btn_type = "primary" if is_curr else "secondary"
+                if st.button(flabel, key=f"fbtn_{fval}", type=btn_type, use_container_width=True):
+                    st.session_state["inbox_active_folder"] = fval
+                    st.rerun()
+            selected_folder_val = active_f_val
+            # Find label
+            selected_folder_label = [k for k, v in folder_map.items() if v == active_f_val][0]
+
+        # =====================================================================
+        # AREA 2: MAIN TICKET LIST
+        # =====================================================================
+        with area2_col:
+            st.markdown(f"##### 📋 {selected_folder_label.split('(')[0].strip()}")
+
+            # Search bar
+            search_query = st.text_input("Search Inbox", placeholder="Search customer, ID, or text...", label_visibility="collapsed", key="ticket_search_query")
+
+            # Sorting options (deterministic)
+            sort_choice = st.selectbox(
+                "Sort",
+                options=[
+                    "Latest queries first",
+                    "Oldest queries first",
+                    "Highest urgency first",
+                    "Lowest confidence first",
+                    "Most relevant"
+                ],
+                label_visibility="collapsed",
+                key="ticket_sort_order"
+            )
+
+            # Secondary Filters expander
+            with st.expander("⚙️ Filter Query Set", expanded=False):
+                flt_intent = st.selectbox("Intent", ["All"] + ai_engine.VALID_INTENTS, key="flt_intent")
+                flt_urgency = st.selectbox("Urgency", ["All", "High", "Medium", "Low"], key="flt_urgency")
+                flt_status = st.selectbox("Status", ["All", "open", "in_progress", "resolved", "closed"], key="flt_status")
+                flt_lang = st.selectbox("Dialect", ["All"] + database.ALL_SUPPORTED_LANGUAGES, key="flt_lang")
+                all_agents = database.list_agents()
+                ag_names = ["All", "Unassigned"] + [a["name"] for a in all_agents]
+                flt_agent = st.selectbox("Assigned Agent", ag_names, key="flt_agent")
+                flt_esc = st.selectbox("Escalation", ["All", "Escalated Only", "Non-Escalated"], key="flt_esc")
+
+            # Deterministic database query
+            inbox_tickets = database.query_agent_inbox(
+                agent_id=current_user["id"],
+                category=st.session_state.get("inbox_active_folder", "inbox"),
+                authorized_languages=auth_langs,
+                sort_by=sort_choice,
+                filter_intent=flt_intent if flt_intent != "All" else None,
+                filter_urgency=flt_urgency if flt_urgency != "All" else None,
+                filter_status=flt_status if flt_status != "All" else None,
+                filter_language=flt_lang if flt_lang != "All" else None,
+                filter_agent=flt_agent if flt_agent != "All" else None,
+                filter_escalated=flt_esc if flt_esc != "All" else None,
+                search_query=search_query
+            )
+
+            st.caption(f"Showing **{len(inbox_tickets)}** ticket(s)")
+
+            if not inbox_tickets:
+                st.info("No queries found matching this mailbox and filter criteria.")
+            else:
+                # If selected_conv_id is not set or not in current list, default to first ticket
+                current_ids = [t["id"] for t in inbox_tickets]
+                if not st.session_state.get("selected_conv_id") or st.session_state["selected_conv_id"] not in current_ids:
+                    st.session_state["selected_conv_id"] = current_ids[0]
+
+                # Render compact rows
+                for t in inbox_tickets:
+                    is_active = (st.session_state["selected_conv_id"] == t["id"])
+                    card_cls = "inbox-card-selected" if is_active else "inbox-card"
+
+                    urg_str = str(t.get("urgency", "medium")).lower()
+                    urg_cls = f"badge-{urg_str}"
+                    conf_pct = int(float(t.get("confidence", 0.85)) * 100)
+
+                    # Short preview text
+                    raw_msg = t.get("initial_text") or t.get("subject") or ""
+                    preview_msg = (raw_msg[:60] + "...") if len(raw_msg) > 60 else raw_msg
+
+                    # Time formatting
+                    time_raw = t.get("last_activity_time") or t.get("updated_at") or ""
+                    time_display = time_raw[11:16] if len(time_raw) >= 16 else time_raw
+
+                    assigned_lbl = t.get("assigned_agent_name") or "Unassigned"
+
                     st.markdown(f"""
-                    <div class="apple-card" style="{sel_border}; padding: 14px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                            <span style="font-weight: 600; font-size: 0.95rem; color: #1d1d1f;">{t['customer_name']}</span>
-                            <div><span class="{urg_cls}">{t['urgency'].upper()}</span> {esc_badge} {wait_badge}</div>
+                    <div class="{card_cls}">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                            <span style="font-weight: 700; font-size: 0.92rem; color: #1d1d1f;">{t['customer_name']}</span>
+                            <span style="font-size: 0.72rem; color: #86868b; font-weight: 500;">{time_display}</span>
                         </div>
-                        <div style="font-size: 0.85rem; color: #1d1d1f; font-weight: 500; margin-bottom: 4px;">
+                        <div style="font-size: 0.83rem; color: #1d1d1f; font-weight: 500; margin-bottom: 3px;">
                             {t['subject']}
                         </div>
-                        <div style="font-size: 0.78rem; color: #6e6e73; margin-bottom: 6px;">
-                            {t['id']} &nbsp;•&nbsp; <span class="lang-pill">{t['detected_language']}</span> &nbsp;•&nbsp; {t['intent']}
+                        <div style="font-size: 0.78rem; color: #6e6e73; margin-bottom: 6px; font-style: italic;">
+                            "{preview_msg}"
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem;">
+                            <div>
+                                <span class="{urg_cls}">{urg_str.upper()}</span>
+                                <span style="color: #6e6e73; margin-left: 4px; font-weight: 500;">{conf_pct}%</span>
+                            </div>
+                            <div style="color: #86868b; font-size: 0.73rem;">
+                                {assigned_lbl} &nbsp;•&nbsp; <b>{t['status'].upper()}</b>
+                            </div>
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
-                    if st.button(f"Inspect Ticket {t['id']}", key=f"btn_inspect_{t['id']}", use_container_width=True):
+
+                    btn_lbl = f"✓ Open {t['id']}" if is_active else f"Open {t['id']}"
+                    if st.button(btn_lbl, key=f"sel_t_{t['id']}", use_container_width=True):
                         st.session_state["selected_conv_id"] = t["id"]
                         st.rerun()
 
-            with t_col_detail:
-                sel_id = st.session_state["selected_conv_id"] or tickets[0]["id"]
-                conv = database.get_conversation(sel_id)
-                if conv:
-                    st.markdown(f"### {conv['subject']}")
-                    st.markdown(f"**Customer:** {conv['customer_name']} &nbsp;•&nbsp; **Status:** `{conv['status'].upper()}` &nbsp;•&nbsp; **Preferred Language:** `{conv.get('preferred_language', 'Auto-Detect')}`")
+        # =====================================================================
+        # AREA 3: DETAILS PANEL & AGENT CONTROLS
+        # =====================================================================
+        with area3_col:
+            active_id = st.session_state.get("selected_conv_id")
+            if not active_id:
+                st.info("Select a ticket from the inbox list to view its complete details and history.")
+            else:
+                conv = database.get_conversation(active_id, include_internal=True)
+                if not conv:
+                    st.warning("Selected ticket could not be loaded.")
+                else:
+                    # Ticket Header Bar
+                    st.markdown(f"#### {conv['subject']}")
                     
-                    # Original text & translation
-                    messages = conv.get("messages", [])
-                    orig_msg = messages[0]["message_text"] if messages else conv["english_translation"]
-                    st.markdown(f"**Original Customer Input:** *\"{orig_msg}\"*")
-                    
-                    st.markdown(f"""
-                    <div class="translation-card">
-                        <div class="translation-title">🔤 English Translation ({conv['detected_language']})</div>
-                        <div class="translation-body">{conv['english_translation']}</div>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    status_badge = "🟢 OPEN" if conv["status"] == "open" else ("🟡 IN PROGRESS" if conv["status"] == "in_progress" else "⚪ RESOLVED")
+                    st.markdown(f"**Ticket ID:** `{conv['id']}` &nbsp;•&nbsp; **Customer:** {conv['customer_name']} &nbsp;•&nbsp; **Status:** `{status_badge}`")
 
-                    # Triage metadata
-                    mc1, mc2, mc3 = st.columns(3)
-                    with mc1:
-                        st.metric("Predicted Intent", conv["intent"])
-                    with mc2:
-                        st.metric("Urgency Level", conv["urgency"].upper())
-                    with mc3:
-                        st.metric("AI Confidence", f"{int(conv['confidence'] * 100)}%")
+                    # Primary Actions: Resolution & Assignment
+                    h_act1, h_act2 = st.columns([1.5, 2.5])
+                    with h_act1:
+                        if conv["status"] in ["resolved", "closed"]:
+                            if st.button("🔄 Reopen Ticket", key=f"reopen_{conv['id']}", use_container_width=True):
+                                database.reopen_conversation(conv["id"])
+                                st.success("Ticket reopened.")
+                                st.rerun()
+                        else:
+                            if st.button("✅ Mark as Resolved", type="primary", key=f"resolve_{conv['id']}", use_container_width=True):
+                                database.update_conversation_status(conv["id"], "resolved")
+                                st.success("Ticket marked as resolved.")
+                                st.rerun()
 
+                    with h_act2:
+                        # Reassign ticket
+                        agents_list = database.list_agents()
+                        agent_choices = {"Unassigned": None}
+                        for ag in agents_list:
+                            agent_choices[ag["name"]] = ag["id"]
+
+                        curr_assigned = conv.get("assigned_agent_name") or "Unassigned"
+                        curr_idx = list(agent_choices.keys()).index(curr_assigned) if curr_assigned in agent_choices else 0
+
+                        reassign_sel = st.selectbox(
+                            "Reassign Specialist:",
+                            options=list(agent_choices.keys()),
+                            index=curr_idx,
+                            key=f"reassign_{conv['id']}",
+                            label_visibility="collapsed"
+                        )
+                        if reassign_sel != curr_assigned:
+                            new_ag_id = agent_choices[reassign_sel]
+                            database.reassign_conversation(conv["id"], new_ag_id, reassign_sel if new_ag_id else None)
+                            st.success(f"Ticket reassigned to {reassign_sel}")
+                            st.rerun()
+
+                    st.markdown("<hr style='margin: 8px 0;'>", unsafe_allow_html=True)
+
+                    # Triage Assessment Card
+                    urg = conv["urgency"].lower()
+                    urg_cls = f"badge-{urg}"
+                    conf_pct = int(float(conv["confidence"]) * 100)
+
+                    m1, m2, m3 = st.columns(3)
+                    with m1:
+                        st.markdown(f"""
+                        <div class="metric-card" style="padding: 10px 14px;">
+                            <div class="metric-card-title">Predicted Intent</div>
+                            <div style="font-size: 1.05rem; font-weight: 600; color: #1d1d1f; margin-top: 2px;">{conv['intent']}</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    with m2:
+                        st.markdown(f"""
+                        <div class="metric-card" style="padding: 10px 14px;">
+                            <div class="metric-card-title">Urgency Level</div>
+                            <div style="margin-top: 4px;"><span class="{urg_cls}">{urg.upper()}</span></div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    with m3:
+                        st.markdown(f"""
+                        <div class="metric-card" style="padding: 10px 14px;">
+                            <div class="metric-card-title">Calibrated Confidence</div>
+                            <div style="font-size: 1.15rem; font-weight: 700; color: #0071e3; margin-top: 2px;">{conf_pct}%</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                    # Escalation Details
                     if conv["escalate"]:
                         st.markdown(f"""
                         <div class="escalate-banner">
                             <strong style="color: #d70015;">🚨 ESCALATION REQUIRED</strong>
-                            <div style="font-size: 0.9rem; margin-top: 4px; color: #4c0519;">
-                                <b>Reason:</b> {conv['escalation_reason']}
+                            <div style="font-size: 0.88rem; margin-top: 4px; color: #4c0519;">
+                                <b>Reason:</b> {conv.get('escalation_reason') or 'Flagged for supervisor review.'}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    else:
+                        st.markdown("""
+                        <div class="no-escalate-banner">
+                            <strong style="color: #1b8738;">✅ ROUTINE INQUIRY</strong>
+                            <div style="font-size: 0.85rem; margin-top: 2px; color: #14532d;">Standard resolution workflow applies.</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                    # Customer Feedback Section (Visible on resolved tickets)
+                    fb_record = database.get_conversation_feedback(conv["id"])
+                    if fb_record:
+                        star_icons = "⭐" * int(fb_record["rating"])
+                        st.markdown(f"""
+                        <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px 16px; margin: 10px 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <strong style="color: #15803d; font-size: 0.95rem;">Customer Review: {star_icons} ({fb_record['rating']}/5)</strong>
+                                <span style="font-size: 0.78rem; color: #166534;">Resolved: <b>{fb_record.get('issue_resolved', 'Yes')}</b></span>
+                            </div>
+                            <div style="font-size: 0.88rem; color: #166534; margin-top: 4px; font-style: italic;">
+                                "{fb_record.get('comment') or 'No additional comment provided.'}"
+                            </div>
+                            <div style="font-size: 0.75rem; color: #15803d; margin-top: 4px;">
+                                Translation Quality: <b>{fb_record.get('translation_quality', 'Good')}</b> • Category: {fb_record.get('category')}
                             </div>
                         </div>
                         """, unsafe_allow_html=True)
 
-                    # Agent Control Actions
-                    st.markdown("##### Agent Assignment & Takeover")
-                    act_col1, act_col2 = st.columns(2)
-                    with act_col1:
-                        if conv.get("assigned_agent_id") != current_user["id"]:
-                            if st.button("🙋 Accept & Join Conversation", type="primary", use_container_width=True):
-                                database.accept_conversation(conv["id"], current_user["id"], current_user["name"])
-                                st.success(f"Accepted ticket. Live agent status active.")
-                                st.rerun()
-                        else:
-                            st.info(f"Assigned to you ({current_user['name']})")
-                    with act_col2:
-                        new_st = st.selectbox("Update Status", ["open", "in_progress", "resolved", "closed"], index=["open", "in_progress", "resolved", "closed"].index(conv["status"]))
-                        if new_st != conv["status"]:
-                            database.update_conversation_status(conv["id"], new_st)
-                            st.success(f"Status updated to {new_st}")
-                            st.rerun()
+                    # Translation Card
+                    messages = conv.get("messages", [])
+                    orig_cust_msg = messages[0]["message_text"] if messages else conv["english_translation"]
+                    st.markdown(f"**Original Message:** *\"{orig_cust_msg}\"*")
+                    st.markdown(f"""
+                    <div class="translation-card">
+                        <div class="translation-title">🔤 English Translation (Detected Dialect: {conv['detected_language']})</div>
+                        <div class="translation-body">{conv['english_translation']}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
 
-                    # Phase 2 Translation of Agent Reply into Customer Language
-                    st.markdown("##### Agent Reply Composer & Multilingual Translation")
-                    cust_target_lang = conv.get("preferred_language")
-                    if not cust_target_lang or cust_target_lang == "Auto-Detect":
-                        cust_target_lang = conv.get("detected_language", "English")
+                    # Chronological Dialogue History
+                    st.markdown("##### 💬 Conversation History")
+                    for m in messages:
+                        stype = m.get("sender_type")
+                        sname = m.get("sender_name", "Support")
+                        t_str = m.get("created_at", "")[:19].replace("T", " ")
+                        mtext = m.get("message_text", "")
+                        mtrans = m.get("english_translation")
 
-                    draft_val = conv.get("draft_reply") or "Thank you for reaching out. We are investigating your inquiry."
+                        if stype == "internal_note":
+                            st.markdown(f"""
+                            <div class="chat-bubble-internal">
+                                <div style="font-size: 0.75rem; font-weight: 700; color: #92400e; margin-bottom: 2px;">
+                                    🔒 INTERNAL STAFF NOTE (Hidden from Customer) &nbsp;•&nbsp; {sname} &nbsp;•&nbsp; {t_str}
+                                </div>
+                                <div style="color: #78350f;">{mtext}</div>
+                            </div>
+                            """, unsafe_allow_html=True)
+                        elif stype == "customer":
+                            trans_block = f'<div style="font-size: 0.78rem; opacity: 0.9; margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 3px;">English: "{mtrans}"</div>' if mtrans and mtrans != mtext else ''
+                            st.markdown(f"""
+                            <div class="chat-bubble-customer">
+                                <div style="font-size: 0.75rem; opacity: 0.85; margin-bottom: 2px;">👤 {sname} &nbsp;•&nbsp; {t_str}</div>
+                                {mtext}
+                                {trans_block}
+                            </div>
+                            """, unsafe_allow_html=True)
+                        elif stype == "agent":
+                            st.markdown(f"""
+                            <div class="chat-bubble-agent">
+                                <div style="font-size: 0.75rem; color: #0071e3; margin-bottom: 2px; font-weight: 600;">🎧 {sname} (Specialist) &nbsp;•&nbsp; {t_str}</div>
+                                {mtext}
+                            </div>
+                            """, unsafe_allow_html=True)
+                        elif stype == "system":
+                            st.markdown(f"""
+                            <div class="chat-bubble-system">
+                                ℹ️ {mtext} &nbsp;•&nbsp; {t_str}
+                            </div>
+                            """, unsafe_allow_html=True)
+                        else:  # AI
+                            st.markdown(f"""
+                            <div class="chat-bubble-ai">
+                                <div style="font-size: 0.75rem; color: #0071e3; font-weight: 600; margin-bottom: 2px;">⚡ {sname} &nbsp;•&nbsp; {t_str}</div>
+                                {mtext}
+                            </div>
+                            """, unsafe_allow_html=True)
+
+                    st.markdown("<hr style='margin: 10px 0;'>", unsafe_allow_html=True)
+
+                    # Agent Reply Composer & Multilingual Translation
+                    st.markdown("##### ✍️ Agent Reply & Customer Communication")
+                    target_cust_lang = conv.get("preferred_language") or conv.get("detected_language", "English")
+
+                    draft_val = conv.get("draft_reply") or "Thank you for reaching out. We are actively investigating your inquiry."
                     agent_eng_draft = st.text_area(
-                        "English Draft / Response:",
+                        "AI Suggested Draft (Editable in English):",
                         value=draft_val,
-                        height=90,
-                        key=f"agent_eng_rep_{conv['id']}"
+                        height=85,
+                        key=f"agent_eng_draft_{conv['id']}"
                     )
 
-                    t_btn_col1, t_btn_col2 = st.columns([2, 3])
-                    with t_btn_col1:
-                        if st.button(f"🌐 Translate Draft to {cust_target_lang}", key=f"btn_trans_{conv['id']}"):
-                            translated_rep = ai_engine.translate_agent_reply(agent_eng_draft, cust_target_lang)
+                    # Clarification Quick Buttons
+                    st.caption("Quick Clarification Templates:")
+                    qc1, qc2, qc3 = st.columns(3)
+                    with qc1:
+                        if st.button("📝 Order ID Request", key=f"qc_order_{conv['id']}", use_container_width=True):
+                            st.session_state[f"agent_eng_draft_{conv['id']}"] = agent_eng_draft + " Could you please provide your Order ID so we can verify the shipment immediately?"
+                            st.rerun()
+                    with qc2:
+                        if st.button("📸 Damaged Photo Request", key=f"qc_photo_{conv['id']}", use_container_width=True):
+                            st.session_state[f"agent_eng_draft_{conv['id']}"] = agent_eng_draft + " Please share a clear photo of the damaged package and product to accelerate your replacement."
+                            st.rerun()
+                    with qc3:
+                        if st.button("🏦 Payment Ref Request", key=f"qc_bank_{conv['id']}", use_container_width=True):
+                            st.session_state[f"agent_eng_draft_{conv['id']}"] = agent_eng_draft + " Could you share your Bank / UPI Transaction Reference Number to trace your payment?"
+                            st.rerun()
+
+                    # Translation Action
+                    tr_c1, _ = st.columns([2.5, 2.5])
+                    with tr_c1:
+                        if st.button(f"🌐 Translate Draft to Customer Language ({target_cust_lang})", key=f"btn_tr_{conv['id']}", use_container_width=True):
+                            translated_rep = ai_engine.translate_agent_reply(agent_eng_draft, target_cust_lang)
                             st.session_state[f"agent_final_rep_{conv['id']}"] = translated_rep
                             st.rerun()
 
                     final_reply_val = st.session_state.get(f"agent_final_rep_{conv['id']}", agent_eng_draft)
                     agent_final_text = st.text_area(
-                        f"Final Reply to Dispatch (Review / Edit before sending):",
+                        "Final Reply to Dispatch (Review / Edit before dispatch):",
                         value=final_reply_val,
-                        height=90,
+                        height=85,
                         key=f"agent_final_input_{conv['id']}"
                     )
 
-                    if st.button("Approve & Send Reply to Customer", type="primary", use_container_width=True):
-                        database.add_message(
-                            conv_id=conv["id"],
-                            sender_type="agent",
-                            sender_id=current_user["id"],
-                            sender_name=current_user["name"],
-                            message_text=agent_final_text.strip()
-                        )
-                        database.update_conversation_status(conv["id"], "in_progress")
-                        st.success("Reply dispatched to customer conversation thread.")
-                        st.rerun()
+                    rc_col1, rc_col2 = st.columns([2, 1.5])
+                    with rc_col1:
+                        if st.button("🚀 Approve & Send Reply to Customer", type="primary", key=f"send_reply_{conv['id']}", use_container_width=True):
+                            clean_reply = agent_final_text.strip()
+                            if clean_reply:
+                                database.add_message(
+                                    conv_id=conv["id"],
+                                    sender_type="agent",
+                                    sender_id=current_user["id"],
+                                    sender_name=current_user["name"],
+                                    message_text=clean_reply
+                                )
+                                # Note: Does NOT automatically mark as resolved
+                                database.update_conversation_status(conv["id"], "in_progress")
+                                st.success("Reply recorded and dispatched to customer thread.")
+                                st.rerun()
 
+                    with rc_col2:
+                        if conv.get("assigned_agent_id") != current_user["id"]:
+                            if st.button("🙋 Take Over Ticket", key=f"takeover_{conv['id']}", use_container_width=True):
+                                database.accept_conversation(conv["id"], current_user["id"], current_user["name"])
+                                st.success(f"Taken over by {current_user['name']}")
+                                st.rerun()
+
+                    # Internal Staff Notes Composer
+                    st.markdown("<hr style='margin: 10px 0;'>", unsafe_allow_html=True)
+                    st.markdown("##### 🔒 Add Internal Note (Staff Only)")
+                    internal_note_text = st.text_input(
+                        "Internal Note (Never visible to customer):",
+                        placeholder="e.g., Escalated to warehouse supervisor regarding missing courier label...",
+                        key=f"internal_note_in_{conv['id']}"
+                    )
+                    if st.button("Save Internal Staff Note", key=f"btn_save_note_{conv['id']}"):
+                        if internal_note_text.strip():
+                            database.add_internal_note(
+                                conv_id=conv["id"],
+                                agent_id=current_user["id"],
+                                agent_name=current_user["name"],
+                                note_text=internal_note_text.strip()
+                            )
+                            st.session_state[f"internal_note_in_{conv['id']}"] = ""
+                            st.success("Internal note logged securely.")
+                            st.rerun()
     # --- Page 2: Live Sessions (Phase 2 Enhanced) ---
     elif section == "Live Sessions":
         st.markdown('<div class="apple-header">Live Customer Sessions</div>', unsafe_allow_html=True)
@@ -1479,6 +1815,18 @@ elif current_user.get("role") in ["agent", "admin"]:
         st.markdown('<div class="apple-sub">Real-time operational distribution of customer inquiries, triage accuracy, and agent performance.</div>', unsafe_allow_html=True)
 
         metrics = database.get_platform_metrics()
+        sess_metrics = database.get_session_analytics_metrics()
+        csat_data = database.get_csat_metrics()
+
+        # Operational Live Analytics KPIs (Phase 3 Section 7)
+        sa1, sa2, sa3, sa4, sa5 = st.columns(5)
+        sa1.metric("Active Sessions", sess_metrics["active_conversations"])
+        sa2.metric("Waiting Customers", sess_metrics["waiting_customers"])
+        sa3.metric("Human Handoffs", sess_metrics["human_handoffs"])
+        sa4.metric("Total Resolved", sess_metrics["resolved_count"])
+        sa5.metric("Avg Response Time", sess_metrics["avg_response_time"])
+
+        st.caption(f"Customer Satisfaction Score: **{csat_data['csat_percent']}%** ({csat_data['label']}, N={csat_data['sample_size']} ratings) • {csat_data['formula_description']}")
         
         # Top KPI Metrics
         k1, k2, k3, k4, k5 = st.columns(5)
