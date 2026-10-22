@@ -203,4 +203,34 @@ python -m pytest tests
 | `pytest tests` | Service Architecture, Regexes & Security | 39 | 39 | 100.0% |
 | **Total Platform Suite** | **Comprehensive End-to-End System** | **140** | **140** | **100.0%** |
 
+---
+
+## 5. Deployment Options
+
+### Option A: Deploy to Vercel (Zero-Config Static WebAssembly)
+This repository is configured with `vercel.json` and `index.html` powered by `@stlite/browser` (Pyodide WebAssembly).
+Because it runs Streamlit natively inside the browser, it requires **zero serverless containers, zero WebSocket proxies, and experiences zero timeout cutoffs**.
+
+1. Go to [Vercel Dashboard](https://vercel.com/).
+2. Click **Add New...** → **Project**.
+3. Select and import `justsamaan/NexAI-Code-Mixed-Triage`.
+4. Leave all build settings at default (`Framework Preset: Other`, `Output Directory: .`).
+5. Click **Deploy**. Your app will be live at `https://<your-project>.vercel.app`.
+
+### Option B: Deploy to Streamlit Community Cloud (Native Python)
+1. Go to [share.streamlit.io](https://share.streamlit.io/).
+2. Click **New app**.
+3. Select repository: `justsamaan/NexAI-Code-Mixed-Triage`, branch: `main`, and main file path: `app.py`.
+4. Click **Deploy!**.
+
+### Option C: Run Locally
+```bash
+git clone https://github.com/justsamaan/NexAI-Code-Mixed-Triage.git
+cd NexAI-Code-Mixed-Triage
+pip install -r requirements.txt
+streamlit run app.py
+```
+Visit `http://localhost:8501` in your browser.
+
+
 

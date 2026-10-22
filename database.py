@@ -41,8 +41,14 @@ def get_db_connection() -> sqlite3.Connection:
     os.makedirs(DB_DIR, exist_ok=True)
     conn = sqlite3.connect(DB_PATH, timeout=20.0)
     conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL;")
-    conn.execute("PRAGMA foreign_keys=ON;")
+    try:
+        conn.execute("PRAGMA journal_mode=WAL;")
+    except Exception:
+        pass
+    try:
+        conn.execute("PRAGMA foreign_keys=ON;")
+    except Exception:
+        pass
     return conn
 
 
