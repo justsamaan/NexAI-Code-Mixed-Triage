@@ -1,0 +1,8 @@
+{
+  "total_records": 24635,
+  "train_records": 17243,
+  "val_records": 3696,
+  "test_records": 3696,
+  "num_classes": 27,
+  "random_seed": 42
+}

@@ -1,0 +1,41 @@
+# Environment variables and secrets
+.env
+*.env
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+
+# Streamlit logs and cache
+.streamlit/
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local database and audit logs (auto-seeded by init_db)
+data/*.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+data/audit_log.jsonl
+
+# Unrelated workspaces and archive bundles
+Aviation/
+Sample 1/
+sample 2/
+code mixed support triage/
