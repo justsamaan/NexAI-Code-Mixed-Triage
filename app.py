@@ -34,184 +34,199 @@ import forge_3d
 from test_cases import TEST_CASES
 
 # -----------------------------------------------------------------------------
-# 1. Page Configuration & Blacksmith Design System with Indic Font Support
+# 1. Page Configuration & Veltrix Design System (Soft Sage, Mint & Crisp White)
 # -----------------------------------------------------------------------------
 
 st.set_page_config(
-    page_title="NexAI Multilingual Support Platform",
-    page_icon="⚒️",
+    page_title="Veltrix | AI Multilingual Support Platform",
+    page_icon="✳️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Blacksmith-inspired forged dark styling with full native Indic typography & shadcn/Radix tokens
+# Veltrix modern dashboard styling with soft sage/mint palette, crisp white cards, and full Indic font support
 st.markdown("""
 <style>
-    /* Global Typography, Canvas & Forge Theme */
+    /* Global Typography & Luminous Sage Environment */
     html, body, [class*="css"], .stApp, .stMarkdown, p, div, span, input, textarea {
         font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
                      "Noto Sans Tamil", "Latha", "Vijaya",
                      "Noto Sans Telugu", "Gautami", "Vani",
                      "Noto Sans Devanagari", "Mangal",
                      "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        color: #f1f5f9;
+        color: #1e293b;
         -webkit-font-smoothing: antialiased;
     }
     
     .stApp {
-        background-color: #0d0f12 !important;
+        background-color: #f1f5f2 !important;
     }
 
-    /* Top Headers with Forge Aesthetics */
-    .apple-header, .forge-header {
+    /* Main Container Padding */
+    .block-container {
+        padding-top: 1.8rem !important;
+        padding-bottom: 3.5rem !important;
+    }
+
+    /* Headers with Veltrix Clean Typography */
+    .apple-header, .forge-header, .veltrix-header {
         font-size: 1.85rem;
-        font-weight: 700;
-        color: #f8fafc;
-        letter-spacing: -0.025em;
+        font-weight: 800;
+        color: #111827;
+        letter-spacing: -0.03em;
         margin-top: 0.2rem;
         margin-bottom: 0.25rem;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
     }
-    .apple-sub, .forge-sub {
+    .apple-sub, .forge-sub, .veltrix-sub {
         font-size: 0.95rem;
-        color: #94a3b8;
-        margin-bottom: 1.4rem;
+        color: #64748b;
+        margin-bottom: 1.3rem;
         font-weight: 400;
         line-height: 1.5;
     }
 
-    /* Tabs Styling - Separate Cards with Distinct Spacing & Glowing Ember Active State */
+    /* Top Tabs Styling - Pill Capsule Navigation matching Veltrix */
     [data-baseweb="tab-list"], .stTabs [role="tablist"] {
-        gap: 12px !important;
-        background-color: transparent !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-        padding: 6px 0 12px 0 !important;
-        margin-bottom: 18px !important;
+        gap: 8px !important;
+        background: #ffffff !important;
+        border: 1px solid #e2ebe3 !important;
+        border-radius: 9999px !important;
+        padding: 5px 8px !important;
+        margin-bottom: 22px !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03) !important;
+        display: inline-flex !important;
     }
     [data-baseweb="tab"], .stTabs [role="tab"] {
-        background: #161920 !important;
-        color: #94a3b8 !important;
-        border: 1px solid rgba(255, 255, 255, 0.09) !important;
-        border-radius: 8px !important;
-        padding: 10px 22px !important;
-        margin-right: 8px !important;
+        background: transparent !important;
+        color: #64748b !important;
+        border: none !important;
+        border-radius: 9999px !important;
+        padding: 8px 20px !important;
+        margin-right: 0 !important;
         font-weight: 600 !important;
-        font-size: 0.90rem !important;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35) !important;
+        font-size: 0.88rem !important;
         transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
     [data-baseweb="tab"]:hover, .stTabs [role="tab"]:hover {
-        background: #1f242e !important;
-        color: #fb923c !important;
-        border-color: rgba(249, 115, 22, 0.45) !important;
-        box-shadow: 0 0 14px rgba(249, 115, 22, 0.2) !important;
+        background: #f1f5f2 !important;
+        color: #111827 !important;
     }
     [data-baseweb="tab"][aria-selected="true"], .stTabs [role="tab"][aria-selected="true"] {
-        background: linear-gradient(135deg, #27170e 0%, #171310 100%) !important;
-        color: #fb923c !important;
-        border: 1px solid #f97316 !important;
-        box-shadow: 0 0 16px rgba(249, 115, 22, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+        background: #dcfce7 !important;
+        color: #15803d !important;
+        border: 1px solid #86efac !important;
+        box-shadow: 0 2px 8px rgba(34, 197, 94, 0.18) !important;
+        font-weight: 700 !important;
     }
     [data-baseweb="tab-highlight"], [data-baseweb="tab-border"] {
         display: none !important;
     }
 
-    /* Cards - Hammered Anvil & Steel */
-    .apple-card, .forge-card {
-        background-color: #14171f;
-        border: 1px solid rgba(255, 255, 255, 0.09);
-        border-radius: 12px;
-        padding: 18px 22px;
-        box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(249, 115, 22, 0.05);
+    /* Veltrix Crisp White Cards with Rounded-2xl & Soft Sage Shadows */
+    .apple-card, .forge-card, .veltrix-card {
+        background-color: #ffffff;
+        border: 1px solid #e2ebe3;
+        border-radius: 18px;
+        padding: 20px 24px;
+        box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
         margin-bottom: 14px;
         transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .apple-card:hover, .forge-card:hover {
-        border-color: rgba(249, 115, 22, 0.45);
-        box-shadow: 0 6px 24px -2px rgba(249, 115, 22, 0.18);
+    .apple-card:hover, .forge-card:hover, .veltrix-card:hover {
+        border-color: #86efac;
+        box-shadow: 0 6px 24px -2px rgba(34, 197, 94, 0.12);
     }
-    .apple-card-title, .forge-card-title {
+    .apple-card-title, .forge-card-title, .veltrix-card-title {
         font-size: 0.78rem;
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.06em;
-        color: #94a3b8;
+        letter-spacing: 0.05em;
+        color: #64748b;
         margin-bottom: 6px;
     }
-    .apple-card-value, .forge-card-value {
-        font-size: 1.55rem;
-        font-weight: 700;
-        color: #f8fafc;
-        letter-spacing: -0.02em;
+    .apple-card-value, .forge-card-value, .veltrix-card-value {
+        font-size: 2.1rem;
+        font-weight: 800;
+        color: #111827;
+        letter-spacing: -0.03em;
     }
 
-    /* Badges & Pills */
+    /* Metric Delta indicator (Lime Green like reference) */
+    .veltrix-delta {
+        font-size: 0.78rem;
+        color: #16a34a;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 4px;
+    }
+
+    /* Badges & Status Pills */
     .badge-pill {
         display: inline-block;
-        padding: 3px 10px;
+        padding: 3px 12px;
         border-radius: 9999px;
-        font-size: 0.8rem;
-        font-weight: 600;
+        font-size: 0.78rem;
+        font-weight: 700;
         letter-spacing: 0.01em;
     }
     .badge-high {
-        background-color: #2b1315;
-        color: #f87171;
-        border: 1px solid #7f1d1d;
-        padding: 3px 10px;
+        background-color: #fee2e2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+        padding: 3px 12px;
         border-radius: 9999px;
         font-weight: 700;
-        font-size: 0.80rem;
+        font-size: 0.78rem;
         display: inline-block;
-        letter-spacing: 0.02em;
     }
     .badge-medium {
-        background-color: #2b1d0c;
-        color: #fbbf24;
-        border: 1px solid #78350f;
-        padding: 3px 10px;
+        background-color: #fef3c7;
+        color: #b45309;
+        border: 1px solid #fde68a;
+        padding: 3px 12px;
         border-radius: 9999px;
         font-weight: 700;
-        font-size: 0.80rem;
+        font-size: 0.78rem;
         display: inline-block;
-        letter-spacing: 0.02em;
     }
     .badge-low {
-        background-color: #0d281e;
-        color: #34d399;
-        border: 1px solid #064e3b;
-        padding: 3px 10px;
+        background-color: #dcfce7;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+        padding: 3px 12px;
         border-radius: 9999px;
         font-weight: 700;
-        font-size: 0.80rem;
+        font-size: 0.78rem;
         display: inline-block;
-        letter-spacing: 0.02em;
     }
     .badge-open {
-        background-color: #11263c;
-        color: #38bdf8;
-        border: 1px solid #0369a1;
-        padding: 2px 8px;
+        background-color: #e0f2fe;
+        color: #0369a1;
+        border: 1px solid #bae6fd;
+        padding: 2px 10px;
         border-radius: 9999px;
         font-size: 0.78rem;
         font-weight: 600;
     }
     .badge-resolved {
-        background-color: #0d281e;
-        color: #34d399;
-        border: 1px solid #064e3b;
-        padding: 2px 8px;
+        background-color: #dcfce7;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+        padding: 2px 10px;
         border-radius: 9999px;
         font-size: 0.78rem;
         font-weight: 600;
     }
     .badge-inprogress {
-        background-color: #2b1d0c;
-        color: #fbbf24;
-        border: 1px solid #78350f;
-        padding: 2px 8px;
+        background-color: #fef3c7;
+        color: #b45309;
+        border: 1px solid #fde68a;
+        padding: 2px 10px;
         border-radius: 9999px;
         font-size: 0.78rem;
         font-weight: 600;
@@ -219,47 +234,46 @@ st.markdown("""
 
     /* Language & Translation Containers */
     .lang-pill {
-        background-color: #161921;
-        color: #f8fafc;
+        background-color: #dcfce7;
+        color: #15803d;
         padding: 3px 10px;
         border-radius: 9999px;
         font-weight: 600;
-        font-size: 0.84rem;
+        font-size: 0.82rem;
         display: inline-block;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid #bbf7d0;
     }
     .translation-card {
-        background-color: #14171f;
-        border: 1px solid rgba(255, 255, 255, 0.09);
-        border-left: 4px solid #f97316;
-        border-radius: 8px;
-        padding: 14px 18px;
+        background-color: #f0fdf4;
+        border: 1.5px solid #86efac;
+        border-radius: 14px;
+        padding: 16px 20px;
         margin-top: 8px;
         margin-bottom: 14px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+        box-shadow: 0 4px 16px rgba(34, 197, 94, 0.08);
     }
     .translation-title {
-        font-size: 0.78rem;
-        font-weight: 600;
+        font-size: 0.75rem;
+        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.06em;
-        color: #fb923c;
+        color: #16a34a;
         margin-bottom: 4px;
     }
     .translation-body {
-        font-size: 1.05rem;
-        font-weight: 500;
-        color: #f8fafc;
+        font-size: 1.12rem;
+        font-weight: 700;
+        color: #111827;
         line-height: 1.45;
     }
     
     /* Internal Staff Notes */
     .chat-bubble-internal {
-        background-color: #261c10;
-        color: #fde047;
-        border: 1px solid rgba(217, 119, 6, 0.35);
-        border-left: 4px solid #d97706;
-        border-radius: 8px;
+        background-color: #fefce8;
+        color: #854d0e;
+        border: 1px solid #fef08a;
+        border-left: 4px solid #eab308;
+        border-radius: 10px;
         padding: 10px 14px;
         margin: 8px 0;
         font-size: 0.90rem;
@@ -268,145 +282,146 @@ st.markdown("""
 
     /* Inbox Rows */
     .inbox-card {
-        background-color: #14171f;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 10px;
+        background-color: #ffffff;
+        border: 1px solid #e2ebe3;
+        border-radius: 12px;
         padding: 12px 14px;
         margin-bottom: 8px;
         transition: all 0.15s ease-in-out;
     }
     .inbox-card:hover {
-        border-color: rgba(249, 115, 22, 0.45);
-        box-shadow: 0 4px 16px rgba(249, 115, 22, 0.15);
+        border-color: #86efac;
+        box-shadow: 0 4px 16px rgba(34, 197, 94, 0.1);
     }
     .inbox-card-selected {
-        background-color: #22160e;
-        border: 2px solid #f97316 !important;
-        border-radius: 10px;
+        background-color: #f0fdf4;
+        border: 2px solid #22c55e !important;
+        border-radius: 12px;
         padding: 12px 14px;
         margin-bottom: 8px;
-        box-shadow: 0 0 16px rgba(249, 115, 22, 0.28);
+        box-shadow: 0 0 16px rgba(34, 197, 94, 0.15);
     }
     .folder-btn-active {
-        background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
-        color: #ffffff !important;
-        border-radius: 8px;
+        background: #dcfce7 !important;
+        color: #15803d !important;
+        border: 1px solid #86efac !important;
+        border-radius: 10px;
         padding: 8px 12px;
-        font-weight: 600;
+        font-weight: 700;
         margin-bottom: 4px;
-        box-shadow: 0 2px 8px rgba(234, 88, 12, 0.35);
     }
     .folder-btn {
-        background-color: #161921;
-        color: #94a3b8;
-        border-radius: 8px;
+        background-color: #ffffff;
+        color: #475569;
+        border-radius: 10px;
         padding: 8px 12px;
         font-weight: 500;
         margin-bottom: 4px;
-        border: 1px solid rgba(255, 255, 255, 0.06);
+        border: 1px solid #e2ebe3;
     }
 
     /* Banners */
     .escalate-banner {
-        background-color: #271416;
-        border: 1px solid rgba(239, 68, 68, 0.3);
+        background-color: #fef2f2;
+        border: 1px solid #fecaca;
         border-left: 4px solid #ef4444;
         padding: 14px 18px;
-        border-radius: 8px;
+        border-radius: 10px;
         margin-top: 10px;
         margin-bottom: 14px;
-        color: #fca5a5;
+        color: #991b1b;
     }
     .no-escalate-banner {
-        background-color: #0d261b;
-        border: 1px solid rgba(16, 185, 129, 0.3);
-        border-left: 4px solid #10b981;
+        background-color: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-left: 4px solid #22c55e;
         padding: 14px 18px;
-        border-radius: 8px;
+        border-radius: 10px;
         margin-top: 10px;
         margin-bottom: 14px;
-        color: #86efac;
+        color: #166534;
     }
     .waiting-banner {
-        background-color: #261b0f;
-        border: 1px solid rgba(249, 115, 22, 0.3);
-        border-left: 4px solid #f97316;
+        background-color: #fffbeb;
+        border: 1px solid #fef3c7;
+        border-left: 4px solid #f59e0b;
         padding: 14px 18px;
-        border-radius: 8px;
+        border-radius: 10px;
         margin-top: 10px;
         margin-bottom: 14px;
-        color: #fed7aa;
+        color: #92400e;
     }
     .joined-banner {
-        background-color: #0f2130;
-        border: 1px solid rgba(56, 189, 248, 0.3);
-        border-left: 4px solid #38bdf8;
+        background-color: #f0f9ff;
+        border: 1px solid #bae6fd;
+        border-left: 4px solid #0284c7;
         padding: 14px 18px;
-        border-radius: 8px;
+        border-radius: 10px;
         margin-top: 10px;
         margin-bottom: 14px;
-        color: #bae6fd;
+        color: #075985;
     }
 
     /* Suggested Reply Box */
     .reply-box {
-        background-color: #14171f;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
+        background-color: #f8faf8;
+        border: 1px solid #e2ebe3;
+        border-radius: 12px;
         padding: 16px;
-        color: #f8fafc;
+        color: #111827;
         line-height: 1.5;
         font-size: 0.95rem;
     }
 
     /* Chat Bubbles */
     .chat-bubble-customer {
-        background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+        background: #111827;
         color: #ffffff !important;
-        border-radius: 14px 14px 3px 14px;
-        padding: 12px 16px;
+        border-radius: 18px 18px 4px 18px;
+        padding: 12px 18px;
         margin: 8px 0;
-        max-width: 82%;
+        max-width: 80%;
         margin-left: auto;
         font-size: 0.95rem;
         line-height: 1.45;
-        box-shadow: 0 2px 8px rgba(234, 88, 12, 0.25);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
     }
     .chat-bubble-customer * {
         color: #ffffff !important;
     }
     .chat-bubble-agent {
-        background-color: #1a1e27;
-        color: #f1f5f9;
-        border: 1px solid rgba(255, 255, 255, 0.09);
-        border-radius: 14px 14px 14px 3px;
-        padding: 12px 16px;
+        background-color: #ffffff;
+        color: #111827;
+        border: 1px solid #e2ebe3;
+        border-radius: 18px 18px 18px 4px;
+        padding: 14px 18px;
         margin: 8px 0;
         max-width: 82%;
         font-size: 0.95rem;
         line-height: 1.45;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
     }
     .chat-bubble-ai {
-        background-color: #151821;
-        color: #f1f5f9;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-left: 4px solid #f97316;
-        border-radius: 8px;
-        padding: 12px 16px;
+        background-color: #ffffff;
+        color: #111827;
+        border: 1px solid #e2ebe3;
+        border-left: 4px solid #22c55e;
+        border-radius: 14px;
+        padding: 14px 18px;
         margin: 8px 0;
         max-width: 85%;
-        font-size: 0.92rem;
+        font-size: 0.95rem;
         line-height: 1.45;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
     }
     .chat-bubble-system {
-        background-color: #14171f;
-        color: #94a3b8;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 6px;
-        padding: 6px 12px;
-        margin: 6px auto;
-        max-width: 90%;
+        background-color: #f1f5f2;
+        color: #64748b;
+        border: 1px solid #e2ebe3;
+        border-radius: 9999px;
+        padding: 6px 14px;
+        margin: 8px auto;
+        max-width: 85%;
         text-align: center;
         font-size: 0.8rem;
         font-weight: 500;
@@ -415,40 +430,137 @@ st.markdown("""
     /* Quick phrase pill */
     .chip-btn {
         display: inline-block;
-        background: #171a22;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        padding: 3px 10px;
+        background: #ffffff;
+        border: 1px solid #e2ebe3;
+        border-radius: 9999px;
+        padding: 5px 14px;
         font-size: 0.82rem;
-        color: #f8fafc;
+        color: #334155;
         margin: 3px;
         cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .chip-btn:hover {
+        background: #dcfce7;
+        color: #15803d;
+        border-color: #86efac;
     }
     
-    /* Legacy Classes for Backward Compatibility */
+    /* Legacy Classes */
     .metric-card {
-        background-color: #14171f;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 10px;
-        padding: 16px 20px;
+        background-color: #ffffff;
+        border: 1px solid #e2ebe3;
+        border-radius: 16px;
+        padding: 18px 22px;
         margin-bottom: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
     }
     .metric-card-title {
         font-size: 0.78rem;
         font-weight: 600;
-        color: #94a3b8;
+        color: #64748b;
         text-transform: uppercase;
         letter-spacing: 0.06em;
     }
     .metric-card-value {
-        font-size: 1.45rem;
-        font-weight: 700;
-        color: #f8fafc;
+        font-size: 1.95rem;
+        font-weight: 800;
+        color: #111827;
     }
     .disclaimer-text {
         font-size: 0.8rem;
-        color: #94a3b8;
+        color: #64748b;
         margin-top: 6px;
+    }
+
+    /* =========================================================================
+       PROPER MODERN SIDEBAR (Veltrix Design System)
+       ========================================================================= */
+    section[data-testid="stSidebar"] {
+        background-color: #ffffff !important;
+        border-right: 1px solid #e2ebe3 !important;
+    }
+
+    /* Hide standard circular radio bullet inputs completely and style as modern navigation cards */
+    section[data-testid="stSidebar"] div[data-testid="stRadio"] > div {
+        gap: 6px !important;
+    }
+    section[data-testid="stSidebar"] div[data-testid="stRadio"] label input[type="radio"],
+    section[data-testid="stSidebar"] div[data-testid="stRadio"] label > div:first-child:not(:last-child),
+    section[data-testid="stSidebar"] div[data-testid="stRadio"] div[data-baseweb="radio"] > div:first-child {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+    }
+    section[data-testid="stSidebar"] div[data-testid="stRadio"] label {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        background: #ffffff !important;
+        border: 1px solid #e2ebe3 !important;
+        border-radius: 12px !important;
+        padding: 10px 14px !important;
+        margin-bottom: 5px !important;
+        cursor: pointer !important;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        display: flex !important;
+        align-items: center !important;
+        color: #334155 !important;
+        font-weight: 500 !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+    }
+    section[data-testid="stSidebar"] div[data-testid="stRadio"] label:hover {
+        background: #f1f5f2 !important;
+        color: #111827 !important;
+        border-color: #bbf7d0 !important;
+        transform: translateX(3px) !important;
+    }
+    section[data-testid="stSidebar"] div[data-testid="stRadio"] label[data-checked="true"],
+    section[data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) {
+        background: #dcfce7 !important;
+        color: #15803d !important;
+        font-weight: 700 !important;
+        border: 1.5px solid #86efac !important;
+        border-left: 4px solid #16a34a !important;
+        box-shadow: 0 2px 10px rgba(34, 197, 94, 0.15) !important;
+    }
+    section[data-testid="stSidebar"] div[data-testid="stRadio"] label[data-checked="true"] p,
+    section[data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) p {
+        color: #15803d !important;
+        font-weight: 700 !important;
+    }
+
+    /* Buttons - Veltrix Rounded Pill styling */
+    button[kind="primary"] {
+        background: #111827 !important;
+        color: #ffffff !important;
+        border-radius: 9999px !important;
+        border: none !important;
+        font-weight: 600 !important;
+        padding: 9px 20px !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1) !important;
+    }
+    button[kind="primary"]:hover {
+        background: #1e293b !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16) !important;
+    }
+    button[kind="secondary"] {
+        background: #ffffff !important;
+        color: #334155 !important;
+        border: 1px solid #e2ebe3 !important;
+        border-radius: 9999px !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease !important;
+    }
+    button[kind="secondary"]:hover {
+        background: #f1f5f2 !important;
+        color: #111827 !important;
+        border-color: #cbd5e1 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -516,9 +628,9 @@ def render_login_view():
 
     # Demo Quick Access Card
     st.markdown("""
-    <div class="apple-card" style="border-left: 4px solid #f97316;">
+    <div class="apple-card" style="border-left: 4px solid #16a34a;">
         <div class="apple-card-title">Hackathon Quick Access</div>
-        <div style="font-size: 0.95rem; color: #f8fafc; margin-bottom: 12px;">
+        <div style="font-size: 0.95rem; color: #334155; margin-bottom: 12px;">
             One-click sign in to explore distinct role experiences:
         </div>
     </div>
@@ -613,15 +725,37 @@ if current_user is None:
 # -----------------------------------------------------------------------------
 
 with st.sidebar:
-    st.markdown("###  NexAI Support")
+    # Veltrix Brand Banner
+    st.markdown("""
+    <div style="display: flex; align-items: center; gap: 12px; padding: 4px 2px 14px 2px; border-bottom: 1px solid #e2ebe3; margin-bottom: 14px;">
+        <div style="width: 38px; height: 38px; border-radius: 12px; background: linear-gradient(135deg, #166534 0%, #22c55e 100%); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; box-shadow: 0 4px 14px rgba(34, 197, 94, 0.28);">
+            ✳️
+        </div>
+        <div>
+            <div style="font-size: 1.18rem; font-weight: 800; color: #111827; letter-spacing: -0.02em; line-height: 1.1;">VELTRIX</div>
+            <div style="font-size: 0.70rem; color: #15803d; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;">AI Support Studio</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
-    # Active User Profile Card
+    # Active User Profile Card (Initials Avatar + Online Badge)
+    name_parts = current_user.get("name", "User").split()
+    initials = "".join([p[0].upper() for p in name_parts[:2]]) if name_parts else "US"
     u_role = current_user.get("role", "customer").capitalize()
+    role_label = "Support Specialist" if current_user.get("role") == "agent" else "Customer Account"
+
     st.markdown(f"""
-    <div style="background: #ffffff; border: 1px solid #d2d2d7; border-radius: 10px; padding: 12px 16px; margin-bottom: 12px;">
-        <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600; color: #86868b;">Logged In As</div>
-        <div style="font-size: 1.05rem; font-weight: 600; color: #f8fafc;">{current_user['name']}</div>
-        <div style="font-size: 0.8rem; color: #f97316; font-weight: 500;">{u_role} Account</div>
+    <div style="background: #ffffff; border: 1px solid #e2ebe3; border-radius: 14px; padding: 12px 14px; margin-bottom: 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background: #111827; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.88rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.12);">
+            {initials}
+        </div>
+        <div style="flex: 1; min-width: 0;">
+            <div style="font-size: 0.95rem; font-weight: 700; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{current_user['name']}</div>
+            <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                <span style="font-size: 0.70rem; font-weight: 700; color: #15803d; background: #dcfce7; border: 1px solid #bbf7d0; padding: 1px 7px; border-radius: 9999px;">● Online</span>
+                <span style="font-size: 0.72rem; color: #64748b; font-weight: 500;">{role_label}</span>
+            </div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -659,7 +793,13 @@ with st.sidebar:
 
     st.divider()
 
-    # Role-Based Navigation
+    # Role-Based Navigation Header
+    st.markdown("""
+    <div style="font-size: 0.72rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; margin: 4px 0 6px 4px; display: flex; align-items: center; gap: 6px;">
+        <span>⚡</span> NAVIGATION
+    </div>
+    """, unsafe_allow_html=True)
+
     if current_user.get("role") == "customer":
         nav_options = [
             "💬 AI Chatbot",
@@ -689,13 +829,17 @@ with st.sidebar:
 
     st.divider()
 
-    # AI Backend Engine Status
+    # AI Backend Engine Status Card
     backend_status = ai_engine.get_backend_status()
-    st.caption("AI Backend Engine")
-    if backend_status["mode"] == "gemini":
-        st.success(f"{backend_status['status_badge']}\n\n**Provider:** {backend_status['name']}")
-    else:
-        st.info(f"{backend_status['status_badge']}\n\n**Provider:** {backend_status['name']}")
+    st.markdown(f"""
+    <div style="background: #ffffff; border: 1px solid #e2ebe3; border-radius: 12px; padding: 12px 14px; margin-top: 4px; margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.02);">
+        <div style="font-size: 0.70rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">AI Core Engine</div>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 0.88rem; font-weight: 700; color: #111827;">{backend_status['name']}</span>
+            <span style="background: #dcfce7; color: #15803d; font-size: 0.70rem; font-weight: 700; padding: 2px 8px; border-radius: 9999px; border: 1px solid #bbf7d0;">🟢 Ready</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     with st.expander("⚙️ Configure API Key"):
         st.caption("Optional Gemini API key for live generative responses.")
@@ -808,14 +952,14 @@ def render_chat_assistant_view():
     """
     st.markdown("""
     <div style="text-align: center; margin-bottom: 24px; padding-top: 6px;">
-        <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(249, 115, 22, 0.12); border: 1px solid rgba(249, 115, 22, 0.35); border-radius: 9999px; padding: 4px 16px; font-size: 0.82rem; color: #fb923c; font-weight: 600; margin-bottom: 12px; box-shadow: 0 0 14px rgba(249, 115, 22, 0.2);">
-            <span>⚒️ NexAI Triage Engine v2.0</span> &nbsp;•&nbsp; <span>Indic Code-Mixed AI & 3D Forge</span>
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: #dcfce7; border: 1px solid #86efac; border-radius: 9999px; padding: 5px 18px; font-size: 0.82rem; color: #15803d; font-weight: 700; margin-bottom: 12px; box-shadow: 0 2px 10px rgba(34, 197, 94, 0.12);">
+            <span>✳️ Veltrix Indic Triage v2.0</span> &nbsp;•&nbsp; <span>Indic Code-Mixed AI & 3D Forge</span>
         </div>
-        <div style="font-size: 2.15rem; font-weight: 700; color: #f8fafc; letter-spacing: -0.03em;">
+        <div style="font-size: 2.25rem; font-weight: 800; color: #111827; letter-spacing: -0.03em;">
             What can I triage for you today?
         </div>
-        <div style="font-size: 0.95rem; color: #94a3b8; max-width: 620px; margin: 8px auto 0 auto; line-height: 1.5;">
-            Type naturally in Hinglish, Tanglish, Telugu+English, or native Indic scripts. The 5-stage forge will automatically detect dialects, translate to standard English, assess urgency, and draft replies.
+        <div style="font-size: 0.98rem; color: #475569; max-width: 650px; margin: 8px auto 0 auto; line-height: 1.55;">
+            Type naturally in Hinglish, Tanglish, Telugu+English, or native Indic scripts. The 5-stage creature forge will automatically detect dialects, translate into standard English, assess urgency, and draft replies.
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -853,26 +997,26 @@ def render_chat_assistant_view():
             if msg["sender"] == "user":
                 st.markdown(f"""
                 <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
-                    <div style="background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 18px 18px 4px 18px; padding: 12px 18px; max-width: 78%; box-shadow: 0 4px 16px rgba(0,0,0,0.35);">
-                        <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 4px; font-weight: 600; text-align: right;">YOU &nbsp;•&nbsp; {msg.get('timestamp', '')}</div>
-                        <div style="font-size: 1.0rem; color: #f8fafc; line-height: 1.5;">{msg['text']}</div>
+                    <div style="background: #111827; border-radius: 18px 18px 4px 18px; padding: 14px 20px; max-width: 78%; box-shadow: 0 4px 16px rgba(0,0,0,0.12);">
+                        <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 4px; font-weight: 700; text-align: right; letter-spacing: 0.04em;">YOU &nbsp;•&nbsp; {msg.get('timestamp', '')}</div>
+                        <div style="font-size: 1.05rem; color: #ffffff; line-height: 1.5; font-weight: 500;">{msg['text']}</div>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
             else:
                 st.markdown(f"""
-                <div style="display: flex; gap: 12px; margin-bottom: 18px;">
-                    <div style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; box-shadow: 0 0 12px rgba(249, 115, 22, 0.45);">
-                        ⚒️
+                <div style="display: flex; gap: 14px; margin-bottom: 18px;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #166534 0%, #22c55e 100%); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0; box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3);">
+                        ✳️
                     </div>
-                    <div style="flex: 1; background: #14171f; border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 4px 18px 18px 18px; padding: 16px 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);">
-                        <div style="font-size: 0.75rem; color: #f97316; font-weight: 700; margin-bottom: 8px;">NEXAI ASSISTANT &nbsp;•&nbsp; {msg.get('timestamp', '')}</div>
-                        <div style="font-size: 1.0rem; color: #f1f5f9; line-height: 1.55;">{msg['text']}</div>
+                    <div style="flex: 1; background: #ffffff; border: 1px solid #e2ebe3; border-left: 4px solid #22c55e; border-radius: 4px 18px 18px 18px; padding: 18px 22px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);">
+                        <div style="font-size: 0.74rem; color: #15803d; font-weight: 800; margin-bottom: 6px; letter-spacing: 0.05em; text-transform: uppercase;">VELTRIX ASSISTANT &nbsp;•&nbsp; {msg.get('timestamp', '')}</div>
+                        <div style="font-size: 1.02rem; color: #111827; line-height: 1.55;">{msg['text']}</div>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
 
-                # If assistant message has structured triage analysis, show rich cards
+                # If assistant message has structured triage analysis, show rich Veltrix cards
                 analysis = msg.get("analysis")
                 if analysis:
                     lang = analysis.get("detected_language", "English")
@@ -881,32 +1025,60 @@ def render_chat_assistant_view():
                     urgency = analysis.get("urgency", "low")
                     conf = float(analysis.get("confidence", 0.85))
                     reply = analysis.get("draft_reply", "")
-                    urg_color = "#ef4444" if urgency == "high" else ("#f59e0b" if urgency == "medium" else "#10b981")
 
-                    c_card1, c_card2 = st.columns([1.8, 1.2])
-                    with c_card1:
-                        st.markdown(f"""
-                        <div style="background: #191d26; border-left: 4px solid #38bdf8; border-radius: 8px; padding: 10px 14px; margin-bottom: 8px;">
-                            <div style="font-size: 0.72rem; color: #38bdf8; font-weight: 700; text-transform: uppercase;">🇬🇧 English Translation</div>
-                            <div style="font-size: 0.95rem; color: #f8fafc; font-weight: 500; margin-top: 2px;">"{trans}"</div>
-                        </div>
-                        """, unsafe_allow_html=True)
-                    with c_card2:
-                        st.markdown(f"""
-                        <div style="background: #191d26; border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px;">
-                            <div style="font-size: 0.78rem; color: #94a3b8;">Dialect: <b style="color: #fb923c;">{lang}</b></div>
-                            <div style="font-size: 0.78rem; color: #94a3b8;">Intent: <b style="color: #f8fafc;">{intent}</b></div>
-                            <div style="font-size: 0.78rem; color: #94a3b8;">Urgency: <b style="color: {urg_color}; text-transform: uppercase;">● {urgency}</b> ({int(conf*100)}% conf)</div>
-                        </div>
-                        """, unsafe_allow_html=True)
-
-                    # AI Suggested Customer Reply Box
+                    # 1. Prominent Hero Final Standardized English Translation Card
                     st.markdown(f"""
-                    <div style="background: rgba(249, 115, 22, 0.08); border: 1px solid rgba(249, 115, 22, 0.25); border-radius: 8px; padding: 10px 14px; margin-bottom: 12px;">
-                        <div style="font-size: 0.72rem; color: #fb923c; font-weight: 700; text-transform: uppercase;">💬 AI-Suggested Response (Dialect Adapted)</div>
-                        <div style="font-size: 0.92rem; color: #f8fafc; font-style: italic; margin-top: 3px;">"{reply}"</div>
+                    <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 14px; padding: 16px 20px; margin: 12px 0 10px 0; box-shadow: 0 4px 16px rgba(34, 197, 94, 0.08);">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 0.75rem; font-weight: 800; color: #15803d; text-transform: uppercase; letter-spacing: 0.06em; display: flex; align-items: center; gap: 6px;">
+                                <span>✅</span> FINAL STANDARDIZED ENGLISH TRANSLATION
+                            </span>
+                            <span style="background: #dcfce7; color: #166534; font-size: 0.72rem; font-weight: 700; padding: 2px 10px; border-radius: 9999px; border: 1px solid #bbf7d0;">
+                                Source Dialect: {lang}
+                            </span>
+                        </div>
+                        <div style="font-size: 1.18rem; font-weight: 800; color: #111827; line-height: 1.45;">
+                            "{trans}"
+                        </div>
                     </div>
                     """, unsafe_allow_html=True)
+
+                    # 2. Metadata Capsule (Intent, Urgency, Calibrated Confidence)
+                    st.markdown(f"""
+                    <div style="background: #ffffff; border: 1px solid #e2ebe3; border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.02);">
+                        <div style="font-size: 0.82rem; color: #475569;">Dialect: <b style="color: #15803d; background: #dcfce7; padding: 2px 8px; border-radius: 9999px;">{lang}</b></div>
+                        <div style="font-size: 0.82rem; color: #475569;">Predicted Intent: <b style="color: #111827;">{intent}</b></div>
+                        <div style="font-size: 0.82rem; color: #475569;">Urgency: <span class="badge-{urgency}">{urgency.upper()}</span> ({int(conf*100)}% conf)</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                    # 3. AI Suggested Customer Reply Box
+                    st.markdown(f"""
+                    <div style="background: #f8faf8; border: 1px solid #e2ebe3; border-radius: 12px; padding: 14px 18px; margin-bottom: 12px;">
+                        <div style="font-size: 0.72rem; color: #15803d; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">💬 AI-Suggested Response (Dialect Adapted)</div>
+                        <div style="font-size: 0.98rem; color: #111827; font-style: italic; margin-top: 4px; line-height: 1.5;">"{reply}"</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                    # 4. Forge Bot Guild Responsibilities & Step-by-Step Explanation Accordion
+                    with st.expander("🤖 What the 5 Forge Bots did for this prompt (Step-by-Step Responsibilities)", expanded=False):
+                        p_msg = msg.get("user_prompt", trans)
+                        pipe = forge_3d.derive_parser_pipeline(p_msg)
+                        creature_emojis = ["🌋", "🧝", "🔨", "💎", "🪽"]
+                        for b_idx, s in enumerate(pipe["steps"]):
+                            st.markdown(f"""
+                            <div style="background: #ffffff; border: 1px solid #e2ebe3; border-radius: 12px; padding: 12px 16px; margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.02);">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                                    <div style="font-weight: 800; font-size: 0.92rem; color: #111827;">
+                                        {creature_emojis[b_idx]} {s['creature']} the {s['title']} &nbsp;•&nbsp; <span style="font-size: 0.75rem; color: #15803d; font-weight: 700;">{s['station']} ({s['state_label']})</span>
+                                    </div>
+                                    <span style="font-size: 0.72rem; color: #475569; background: #f1f5f2; padding: 2px 8px; border-radius: 9999px;">Action: {s['action']}</span>
+                                </div>
+                                <div style="font-size: 0.85rem; color: #334155; line-height: 1.45; margin-top: 4px;">
+                                    <b>Live Bot Voice:</b> "{s['bot_explanation']}"
+                                </div>
+                            </div>
+                            """, unsafe_allow_html=True)
 
                     btn_c1, btn_c2 = st.columns([1.5, 3])
                     with btn_c1:
@@ -1046,16 +1218,22 @@ def render_3d_forge_view():
         S4: Pyra the Urgency Sprite (Intent & Urgency Gem-Cutter)
         S5: Hermes the Dispatch Automaton (Dispatch Beacon -> ACCEPT)
     - Prompt crystal traveling sequentially across energy rails from S1 to S5.
+    - Dedicated Forge Bot Guild Cards explaining each bot's responsibilities & live voice.
     - Interactive Bottom-Up Parser State Derivation Table (Free Navigation Table) below canvas.
-    - Final Translation & AI-Synthesized Agent Reply card.
+    - Final Standardized Translation & AI-Synthesized Agent Reply card.
     """
     st.markdown("""
-    <div class="forge-header">
-        <span>⚒️ 3D Workstation Forge & Bottom-Up State Derivation</span>
-    </div>
-    <div class="forge-sub">
-        Explore how customer prompts traverse 5 specialized workstations staffed by Tiny Blacksmith Creatures.
-        Derived transitions mirror a formal Bottom-Up LR Parser State Derivation from <code>S0</code> to <code>ACCEPT</code>.
+    <div style="margin-bottom: 20px;">
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: #dcfce7; border: 1px solid #86efac; border-radius: 9999px; padding: 4px 16px; font-size: 0.80rem; color: #15803d; font-weight: 700; margin-bottom: 8px;">
+            <span>⚒️ 3D Workstation Forge & Bottom-Up State Derivation</span>
+        </div>
+        <div style="font-size: 2.1rem; font-weight: 800; color: #111827; letter-spacing: -0.03em;">
+            Interactive Workstation Guild & LR Parser Pipeline
+        </div>
+        <div style="font-size: 0.95rem; color: #475569; max-width: 780px; margin-top: 6px; line-height: 1.5;">
+            Explore how customer prompts traverse 5 specialized workstations staffed by Tiny Blacksmith Creatures.
+            Derived transitions mirror a formal Bottom-Up LR Parser State Derivation from <code>S0</code> to <code>ACCEPT</code>.
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -1104,15 +1282,56 @@ def render_3d_forge_view():
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # 3. Bottom-Up Parser State Derivation Table (Free Navigation Table)
+    # 3. Forge Bot Guild: Explicit Workstation Responsibilities & Explanations
+    st.markdown("### 🤖 Forge Bot Guild: Workstation Responsibilities & Live Explanations")
+    st.markdown("""
+    Each workstation in the forge is run by a dedicated creature specialist with a defined operational responsibility.
+    Here is what each bot does and their live voice explanation for the active prompt:
+    """)
+
+    pipe = forge_3d.derive_parser_pipeline(active_prompt)
+    steps = pipe["steps"]
+
+    guild_cards_cols = st.columns(5)
+    creature_avatars = ["🌋", "🧝", "🔨", "💎", "🪽"]
+    resp_summaries = [
+        "Script ingestion, Unicode normalization, Devanagari/Telugu/Tamil script detection & lexical tokenization.",
+        "Code-mix syntax analysis, Hinglish/Tanglish/Tenglish classification, phonetic pattern extraction.",
+        "Indic idiomatic lexicon mapping, romanized phrase substitution, forging final standard English translation.",
+        "Complaint domain intent recognition, customer sentiment intensity, calibrated urgency & SLA scoring.",
+        "Escalation routing to human specialist, language matching, dialect-adapted reply drafting & ACCEPT closure."
+    ]
+
+    for b_idx, s in enumerate(steps):
+        with guild_cards_cols[b_idx]:
+            st.markdown(f"""
+            <div style="background: #ffffff; border: 1px solid #e2ebe3; border-radius: 16px; padding: 14px; height: 100%; box-shadow: 0 2px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column;">
+                <div style="font-size: 1.8rem; margin-bottom: 4px;">{creature_avatars[b_idx]}</div>
+                <div style="font-size: 1.0rem; font-weight: 800; color: #111827;">{s['creature']}</div>
+                <div style="font-size: 0.72rem; color: #15803d; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">
+                    {s['title']} • {s['state_label']}
+                </div>
+                <div style="font-size: 0.74rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;">Primary Responsibility:</div>
+                <div style="font-size: 0.80rem; color: #334155; line-height: 1.4; margin-top: 2px; margin-bottom: 10px;">
+                    {resp_summaries[b_idx]}
+                </div>
+                <div style="margin-top: auto; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 10px;">
+                    <div style="font-size: 0.68rem; color: #15803d; font-weight: 800; text-transform: uppercase;">Live Bot Explanation:</div>
+                    <div style="font-size: 0.78rem; color: #14532d; line-height: 1.4; font-style: italic; margin-top: 3px;">
+                        "{s['bot_explanation']}"
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # 4. Bottom-Up Parser State Derivation Table (Free Navigation Table)
     st.markdown("### 📋 Bottom-Up Parser State Derivation Table")
     st.markdown("""
     In a bottom-up parser, input tokens are shifted onto the stack and reduced according to production rules until the start symbol is derived.
     Here, the prompt is transformed step-by-step through the 5 creature workstations:
     """)
-
-    pipe = forge_3d.derive_parser_pipeline(active_prompt)
-    steps = pipe["steps"]
 
     # Free Navigation State Filter
     state_filter = st.radio(
@@ -1164,7 +1383,7 @@ def render_3d_forge_view():
                 st.markdown(f"**Station Output Payload:**")
                 st.json(s["output_payload"])
 
-    # 4. Final Translation & AI Agent Reply Card (ACCEPT)
+    # 5. Final Standardized Translation & AI Agent Reply Card (ACCEPT)
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("### 🏆 Final Forged Result (Parser ACCEPT)")
 
@@ -1178,30 +1397,30 @@ def render_3d_forge_view():
     urg_badge = "🔴 High" if final_urgency == "high" else ("🟡 Medium" if final_urgency == "medium" else "🟢 Low")
 
     st.markdown(f"""
-    <div class="forge-card" style="border: 2px solid #f97316; box-shadow: 0 0 24px rgba(249, 115, 22, 0.25);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <div style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: #fb923c; font-weight: 700;">
+    <div style="background: #ffffff; border: 1.5px solid #86efac; border-radius: 18px; padding: 22px 24px; box-shadow: 0 4px 20px rgba(34, 197, 94, 0.12);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <div style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: #15803d; font-weight: 800;">
                 Production Output • S5 ACCEPT
             </div>
-            <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; border-radius: 9999px; padding: 3px 12px; font-size: 0.78rem; color: #34d399; font-weight: 600;">
+            <div style="background: #dcfce7; border: 1px solid #86efac; border-radius: 9999px; padding: 4px 14px; font-size: 0.78rem; color: #15803d; font-weight: 700;">
                 ✓ Triage Synthesized
             </div>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px;">
-            <div style="background: #0f131a; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px;">
-                <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 600;">ORIGINAL INPUT</div>
-                <div style="font-size: 1.05rem; color: #f8fafc; font-weight: 600; margin-top: 4px;">"{active_prompt}"</div>
-                <div style="font-size: 0.8rem; color: #fb923c; margin-top: 4px;">Detected: <b>{final_lang}</b></div>
+            <div style="background: #f8faf8; border: 1px solid #e2ebe3; border-radius: 12px; padding: 14px 16px;">
+                <div style="font-size: 0.74rem; color: #64748b; font-weight: 700; text-transform: uppercase;">ORIGINAL INPUT</div>
+                <div style="font-size: 1.12rem; color: #111827; font-weight: 700; margin-top: 4px;">"{active_prompt}"</div>
+                <div style="font-size: 0.82rem; color: #15803d; margin-top: 6px;">Detected: <b>{final_lang}</b></div>
             </div>
-            <div style="background: #0f131a; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px;">
-                <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 600;">FINAL STANDARDIZED TRANSLATION</div>
-                <div style="font-size: 1.05rem; color: #38bdf8; font-weight: 600; margin-top: 4px;">"{final_trans}"</div>
-                <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 4px;">Intent: <b>{final_intent}</b> • Urgency: <b>{urg_badge}</b> ({int(final_conf*100)}%)</div>
+            <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 12px; padding: 14px 16px;">
+                <div style="font-size: 0.74rem; color: #15803d; font-weight: 800; text-transform: uppercase;">FINAL STANDARDIZED TRANSLATION</div>
+                <div style="font-size: 1.15rem; color: #111827; font-weight: 800; margin-top: 4px;">"{final_trans}"</div>
+                <div style="font-size: 0.82rem; color: #475569; margin-top: 6px;">Intent: <b>{final_intent}</b> • Urgency: <b>{urg_badge}</b> ({int(final_conf*100)}%)</div>
             </div>
         </div>
-        <div style="background: rgba(249, 115, 22, 0.09); border: 1px solid rgba(249, 115, 22, 0.3); border-radius: 8px; padding: 14px;">
-            <div style="font-size: 0.75rem; color: #fb923c; font-weight: 700; text-transform: uppercase;">💬 AI-Suggested Agent Reply (Ready to Deliver)</div>
-            <div style="font-size: 1.0rem; color: #f8fafc; margin-top: 4px; line-height: 1.5; font-style: italic;">
+        <div style="background: #f8faf8; border: 1px solid #e2ebe3; border-radius: 12px; padding: 14px 18px;">
+            <div style="font-size: 0.74rem; color: #15803d; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em;">💬 AI-Suggested Agent Reply (Ready to Deliver)</div>
+            <div style="font-size: 1.0rem; color: #111827; margin-top: 4px; line-height: 1.5; font-style: italic;">
                 "{final_reply}"
             </div>
         </div>
@@ -1267,13 +1486,13 @@ elif current_user.get("role") == "customer":
                 st.markdown(f"""
                 <div class="apple-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <span style="font-weight: 600; font-size: 1.05rem; color: #f8fafc;">{conv['subject']}</span>
+                        <span style="font-weight: 700; font-size: 1.05rem; color: #111827;">{conv['subject']}</span>
                         <div>{st_badge} &nbsp; {urg_badge}</div>
                     </div>
-                    <div style="font-size: 0.85rem; color: #6e6e73; margin-bottom: 8px;">
+                    <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 8px;">
                         Ticket ID: <code>{conv['id']}</code> &nbsp;•&nbsp; Dialect: <span class="lang-pill">{conv['detected_language']}</span> &nbsp;•&nbsp; Intent: <b>{conv['intent']}</b>
                     </div>
-                    <div style="font-size: 0.95rem; color: #424245;">
+                    <div style="font-size: 0.95rem; color: #334155;">
                         <i>"{conv['english_translation']}"</i>
                     </div>
                 </div>
@@ -1380,15 +1599,15 @@ elif current_user.get("role") == "customer":
                     elif sender == "agent":
                         st.markdown(f"""
                         <div class="chat-bubble-agent">
-                            <div style="font-size: 0.75rem; color: #f97316; margin-bottom: 4px; font-weight: 600;">🎧 {name} (Support Specialist) &nbsp;•&nbsp; {time_str}</div>
-                            <div style="font-size: 0.98rem; color: #f8fafc;">{msg_text}</div>
+                            <div style="font-size: 0.75rem; color: #15803d; margin-bottom: 4px; font-weight: 700; text-transform: uppercase;">🎧 {name} (Support Specialist) &nbsp;•&nbsp; {time_str}</div>
+                            <div style="font-size: 0.98rem; color: #111827;">{msg_text}</div>
                         </div>
                         """, unsafe_allow_html=True)
                     elif sender == "ai":
                         st.markdown(f"""
                         <div class="chat-bubble-ai">
-                            <div style="font-size: 0.75rem; color: #f97316; font-weight: 600; margin-bottom: 4px;">⚡ {name} &nbsp;•&nbsp; {time_str}</div>
-                            <div style="font-size: 0.95rem; color: #f8fafc;">{msg_text}</div>
+                            <div style="font-size: 0.75rem; color: #15803d; font-weight: 700; margin-bottom: 4px; text-transform: uppercase;">⚡ {name} &nbsp;•&nbsp; {time_str}</div>
+                            <div style="font-size: 0.95rem; color: #111827;">{msg_text}</div>
                         </div>
                         """, unsafe_allow_html=True)
                     elif sender == "system":
@@ -1481,8 +1700,8 @@ elif current_user.get("role") == "customer":
                     existing_fb = database.get_conversation_feedback(conv["id"])
                     if existing_fb:
                         st.markdown(f"""
-                        <div class="apple-card" style="border-left: 4px solid #34c759;">
-                            <div style="font-weight: 600; font-size: 1.05rem; color: #f8fafc; margin-bottom: 4px;">
+                        <div class="apple-card" style="border-left: 4px solid #16a34a;">
+                            <div style="font-weight: 700; font-size: 1.05rem; color: #111827; margin-bottom: 4px;">
                                 ✅ Feedback Recorded (Thank You!)
                             </div>
                             <div style="font-size: 0.95rem; color: #424245; line-height: 1.5;">
@@ -1618,11 +1837,11 @@ elif current_user.get("role") == "customer":
                         
                         # Show instant triage confirmation
                         st.markdown(f"""
-                        <div class="apple-card" style="border-left: 4px solid #34c759;">
-                            <div style="font-weight: 600; font-size: 1.05rem; color: #f8fafc; margin-bottom: 6px;">
+                        <div class="apple-card" style="border-left: 4px solid #16a34a;">
+                            <div style="font-weight: 700; font-size: 1.05rem; color: #111827; margin-bottom: 6px;">
                                 Inquiry Received & Triaged
                             </div>
-                            <div style="font-size: 0.9rem; color: #424245; line-height: 1.5;">
+                            <div style="font-size: 0.9rem; color: #334155; line-height: 1.5;">
                                 • <b>Detected Dialect:</b> <span class="lang-pill">{triage_res['detected_language']}</span><br>
                                 • <b>Understood Meaning:</b> <i>"{triage_res['english_translation']}"</i><br>
                                 • <b>Categorized Intent:</b> {triage_res['intent']} (Urgency: {triage_res['urgency'].upper()})<br>
@@ -1656,13 +1875,13 @@ elif current_user.get("role") == "customer":
                 st.markdown(f"""
                 <div class="apple-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                        <span style="font-weight: 600; color: #f8fafc; font-size: 1.05rem;">{'⭐' * f['rating']} &nbsp;•&nbsp; {f['category']}</span>
-                        <span style="font-size: 0.8rem; color: #86868b;">{f['created_at'][:10]}</span>
+                        <span style="font-weight: 700; color: #111827; font-size: 1.05rem;">{'⭐' * f['rating']} &nbsp;•&nbsp; {f['category']}</span>
+                        <span style="font-size: 0.8rem; color: #64748b;">{f['created_at'][:10]}</span>
                     </div>
-                    <div style="font-size: 0.85rem; color: #6e6e73; margin-bottom: 6px;">
+                    <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 6px;">
                         Ticket: <code>{f['conversation_id']}</code> &nbsp;•&nbsp; Specialist: <b>{f.get('agent_name') or 'Customer Support'}</b> &nbsp;•&nbsp; Translation Quality: <b>{f.get('translation_quality', 'N/A')}</b>
                     </div>
-                    <div style="font-size: 0.95rem; color: #424245;">
+                    <div style="font-size: 0.95rem; color: #334155;">
                         {f['comment'] if f['comment'] else '<i>No additional comments provided.</i>'}
                     </div>
                 </div>
@@ -1918,21 +2137,21 @@ elif current_user.get("role") in ["agent", "admin"]:
                     st.markdown(f"""
                     <div class="{card_cls}">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
-                            <span style="font-weight: 700; font-size: 0.92rem; color: #f8fafc;">{t['customer_name']}</span>
-                            <span style="font-size: 0.72rem; color: #86868b; font-weight: 500;">{time_display}</span>
+                            <span style="font-weight: 700; font-size: 0.92rem; color: #111827;">{t['customer_name']}</span>
+                            <span style="font-size: 0.72rem; color: #64748b; font-weight: 500;">{time_display}</span>
                         </div>
-                        <div style="font-size: 0.83rem; color: #f8fafc; font-weight: 500; margin-bottom: 3px;">
+                        <div style="font-size: 0.83rem; color: #334155; font-weight: 600; margin-bottom: 3px;">
                             {t['subject']}
                         </div>
-                        <div style="font-size: 0.78rem; color: #6e6e73; margin-bottom: 6px; font-style: italic;">
+                        <div style="font-size: 0.78rem; color: #64748b; margin-bottom: 6px; font-style: italic;">
                             "{preview_msg}"
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem;">
                             <div>
                                 <span class="{urg_cls}">{urg_str.upper()}</span>
-                                <span style="color: #6e6e73; margin-left: 4px; font-weight: 500;">{conf_pct}%</span>
+                                <span style="color: #64748b; margin-left: 4px; font-weight: 500;">{conf_pct}%</span>
                             </div>
-                            <div style="color: #86868b; font-size: 0.73rem;">
+                            <div style="color: #64748b; font-size: 0.73rem;">
                                 {assigned_lbl} &nbsp;•&nbsp; <b>{t['status'].upper()}</b>
                             </div>
                         </div>
@@ -2011,7 +2230,7 @@ elif current_user.get("role") in ["agent", "admin"]:
                         st.markdown(f"""
                         <div class="metric-card" style="padding: 10px 14px;">
                             <div class="metric-card-title">Predicted Intent</div>
-                            <div style="font-size: 1.05rem; font-weight: 600; color: #f8fafc; margin-top: 2px;">{conv['intent']}</div>
+                            <div style="font-size: 1.05rem; font-weight: 700; color: #111827; margin-top: 2px;">{conv['intent']}</div>
                         </div>
                         """, unsafe_allow_html=True)
                     with m2:
@@ -2025,7 +2244,7 @@ elif current_user.get("role") in ["agent", "admin"]:
                         st.markdown(f"""
                         <div class="metric-card" style="padding: 10px 14px;">
                             <div class="metric-card-title">Calibrated Confidence</div>
-                            <div style="font-size: 1.15rem; font-weight: 700; color: #f97316; margin-top: 2px;">{conf_pct}%</div>
+                            <div style="font-size: 1.15rem; font-weight: 700; color: #15803d; margin-top: 2px;">{conf_pct}%</div>
                         </div>
                         """, unsafe_allow_html=True)
 
@@ -2554,27 +2773,27 @@ elif current_user.get("role") in ["agent", "admin"]:
                 for cl in rc_data["clusters"]:
                     urg_cls = f"badge-{cl['typical_urgency'].lower()}"
                     st.markdown(f"""
-                    <div class="apple-card" style="padding: 14px 18px; margin-bottom: 12px;">
+                    <div class="apple-card" style="padding: 16px 20px; margin-bottom: 12px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                             <div>
-                                <span style="font-weight: 700; font-size: 1.05rem; color: #f8fafc;">{cl['name']}</span>
-                                &nbsp;<span style="font-size: 0.8rem; color: #86868b;">({cl['cluster_id']})</span>
+                                <span style="font-weight: 800; font-size: 1.05rem; color: #111827;">{cl['name']}</span>
+                                &nbsp;<span style="font-size: 0.8rem; color: #64748b;">({cl['cluster_id']})</span>
                             </div>
                             <div>
                                 <span class="{urg_cls}">TYPICAL: {cl['typical_urgency'].upper()}</span>
-                                &nbsp;<span style="font-size: 0.82rem; font-weight: 600; color: #d70015; background: #fee2e2; padding: 2px 8px; border-radius: 10px;">Escalation: {cl['escalation_rate']}%</span>
+                                &nbsp;<span style="font-size: 0.82rem; font-weight: 700; color: #b91c1c; background: #fee2e2; border: 1px solid #fecaca; padding: 2px 8px; border-radius: 10px;">Escalation: {cl['escalation_rate']}%</span>
                             </div>
                         </div>
-                        <div style="font-size: 0.88rem; color: #f97316; font-weight: 600; margin-bottom: 6px;">
+                        <div style="font-size: 0.88rem; color: #15803d; font-weight: 700; margin-bottom: 6px;">
                             Theme: {cl['theme']}
                         </div>
-                        <div style="display: flex; gap: 18px; font-size: 0.82rem; color: #6e6e73; margin-bottom: 8px;">
+                        <div style="display: flex; gap: 18px; font-size: 0.82rem; color: #64748b; margin-bottom: 8px;">
                             <span>Volume: <b>{cl['count']} complaints</b></span>
                             <span>Trend vs Baseline: <b>{cl['trend_vs_prior']}</b></span>
                         </div>
-                        <div style="background-color: #181c24; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 8px 12px; font-size: 0.82rem; color: #f8fafc;">
-                            <b>Representative Customer Excerpts:</b>
-                            <ul style="margin: 4px 0 0 16px; padding: 0;">
+                        <div style="background-color: #f8faf8; border: 1px solid #e2ebe3; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: #111827;">
+                            <b style="color: #475569;">Representative Customer Excerpts:</b>
+                            <ul style="margin: 4px 0 0 16px; padding: 0; color: #334155;">
                                 {"".join(f"<li>{quote}</li>" for quote in cl['representative_examples'])}
                             </ul>
                         </div>
@@ -2594,23 +2813,23 @@ elif current_user.get("role") in ["agent", "admin"]:
             else:
                 for pat in rc_data["product_process_patterns"]:
                     st.markdown(f"""
-                    <div class="apple-card" style="padding: 14px 18px; margin-bottom: 12px; border-left: 4px solid #f97316;">
+                    <div class="apple-card" style="padding: 16px 20px; margin-bottom: 12px; border-left: 4px solid #16a34a;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <span style="font-weight: 700; font-size: 1.0rem; color: #f8fafc;">{pat['entity']}</span>
+                            <span style="font-weight: 800; font-size: 1.05rem; color: #111827;">{pat['entity']}</span>
                             <span class="lang-pill">{pat['type']} • {pat['count']} tickets</span>
                         </div>
                         <div style="margin-top: 6px; font-size: 0.88rem;">
                             <div style="margin-bottom: 4px;">
-                                <b style="color: #f8fafc;">🔍 Observed Complaint Pattern:</b>
-                                <span style="color: #cbd5e1;"> {pat['observed_pattern']}</span>
+                                <b style="color: #111827;">🔍 Observed Complaint Pattern:</b>
+                                <span style="color: #334155;"> {pat['observed_pattern']}</span>
                             </div>
                             <div style="margin-bottom: 4px;">
-                                <b style="color: #fbbf24;">💡 Possible Operational Explanation:</b>
-                                <span style="color: #cbd5e1;"> {pat['possible_explanation']}</span>
+                                <b style="color: #b45309;">💡 Possible Operational Explanation:</b>
+                                <span style="color: #334155;"> {pat['possible_explanation']}</span>
                             </div>
                             <div>
-                                <b style="color: #34d399;">✅ Confirmed Root Cause / Action:</b>
-                                <span style="color: #cbd5e1;"> {pat['confirmed_cause']}</span>
+                                <b style="color: #15803d;">✅ Confirmed Root Cause / Action:</b>
+                                <span style="color: #334155;"> {pat['confirmed_cause']}</span>
                             </div>
                         </div>
                     </div>
@@ -2624,9 +2843,9 @@ elif current_user.get("role") in ["agent", "admin"]:
             st.markdown("##### 📌 Emerging Issues Executive Summary")
             st.caption("Data-grounded key takeaways for customer-care managers and operations leaders:")
 
-            sum_html = "".join(f"<li style='margin-bottom: 6px; font-size: 0.92rem; color: #f8fafc;'>{bullet}</li>" for bullet in rc_data["emerging_summary"])
+            sum_html = "".join(f"<li style='margin-bottom: 6px; font-size: 0.92rem; color: #111827;'>{bullet}</li>" for bullet in rc_data["emerging_summary"])
             st.markdown(f"""
-            <div style="background-color: #14171f; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 16px 20px;">
+            <div style="background-color: #ffffff; border: 1px solid #e2ebe3; border-radius: 14px; padding: 18px 22px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
                 <ul style="margin: 0; padding-left: 20px;">
                     {sum_html}
                 </ul>

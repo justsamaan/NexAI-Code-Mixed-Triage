@@ -260,6 +260,51 @@ TRANSLATION_DICTIONARY = {
 }
 
 
+# Indic Lexical Dictionaries for Word-Level Code-Mixed Translation
+HINDI_LEXICON = {
+    "mera": "my", "meri": "my", "mere": "my", "mujhe": "I", "mujhko": "to me",
+    "humara": "our", "aapka": "your", "saman": "item/goods", "cheez": "item",
+    "paisa": "money", "paise": "money", "rupaye": "rupees", "khola": "opened",
+    "packet": "parcel", "toota": "broken", "tooti": "broken", "kharab": "defective",
+    "galat": "wrong", "turant": "immediately", "jaldi": "quickly", "bhejo": "send",
+    "bheja": "sent", "bhej": "sent", "diya": "gave", "kripya": "please", "bhai": "sir",
+    "kab": "when", "kahan": "where", "kyun": "why", "kaise": "how", "kitna": "how much",
+    "kitne": "how many", "nahi": "not", "na": "not", "mat": "do not", "hua": "happened",
+    "hui": "happened", "hue": "happened", "hai": "is", "hain": "are", "tha": "was",
+    "thi": "was", "the": "were", "hoga": "will be", "hogi": "will be", "aayega": "will arrive",
+    "aayegi": "will arrive", "aaya": "arrived", "aayi": "arrived", "aaye": "arrived",
+    "mila": "received", "mili": "received", "mile": "received", "milega": "will receive",
+    "pahuncha": "reached", "pahunchi": "reached", "wapas": "back/refund", "chahiye": "need",
+    "karna": "to do", "kardo": "please do", "karo": "do", "karein": "do", "kar": "do",
+    "raha": "is", "rahi": "is", "rahe": "are", "dikkat": "issue", "problem": "issue",
+    "madad": "help", "baat": "speak", "karni": "want to", "par": "on/but", "se": "from",
+    "mein": "in", "ka": "of", "ki": "of", "ke": "of", "ko": "to", "tak": "until/yet",
+    "abhi": "now/yet", "do": "two", "baar": "times", "cut": "deducted", "gaya": "gone/done"
+}
+
+TELUGU_LEXICON = {
+    "naa": "my", "naaku": "to me / I", "naku": "to me / I", "maaku": "to us",
+    "meeru": "you", "inka": "yet / still", "avvaledu": "has not happened",
+    "raaledu": "did not arrive", "raledu": "did not arrive", "vachindi": "arrived",
+    "chala": "very", "late": "delayed", "avutundi": "becoming", "ayindi": "happened",
+    "ayyindi": "happened", "padaledu": "not credited", "rendu": "two", "saarlu": "times",
+    "sarlu": "times", "kavali": "need / want", "kaavali": "need / want", "cheyyandi": "please do",
+    "cheyyali": "need to do", "pani": "work", "cheyyatledu": "is not working",
+    "ekkada": "where", "undi": "is", "konchem": "some / little", "matladali": "want to speak",
+    "tho": "with", "lo": "in", "nunchi": "from", "kani": "but"
+}
+
+TAMIL_LEXICON = {
+    "en": "my", "enakku": "to me / I", "ungala": "your", "innum": "yet / still",
+    "varala": "did not arrive", "varave": "at all", "illa": "not", "vandhuchu": "arrived",
+    "romba": "very", "late": "delayed", "aagudhu": "happening", "la": "in",
+    "irundhu": "from", "aana": "but", "aagala": "did not happen", "rendu": "two",
+    "vaati": "times", "aachu": "happened", "venum": "want / need", "panna": "to do",
+    "mudiyuma": "can you", "mudila": "unable to", "anupiteenga": "you sent",
+    "ullara": "inside", "therila": "do not know", "solraru": "is saying"
+}
+
+
 def translate_to_english(message: str, detected_lang: str) -> str:
     """
     Translates a code-mixed message (Telugu+English, Tanglish, Hinglish) to clear English.
@@ -280,7 +325,10 @@ def translate_to_english(message: str, detected_lang: str) -> str:
         return TRANSLATION_DICTIONARY[lower_msg]
 
     for k, v in TRANSLATION_DICTIONARY.items():
-        if k in lower_msg or lower_msg in k:
+        if k == lower_msg:
+            return v
+        # Match if key is complete sentence inside message
+        if len(k) > 15 and k in lower_msg:
             return v
 
     # 2. Rule-based translation synthesis for unseen code-mixed sentences
@@ -327,15 +375,18 @@ def translate_to_english(message: str, detected_lang: str) -> str:
 
     # Hindi phrase replacements
     hindi_phrases = [
+        (r"bhai\s+mera\s+refund|mera\s+refund", "my refund"),
+        (r"\bbhai\b", "please"),
         (r"mera\s+order\s+deliver\s+nahi\s+hua|order\s+deliver\s+nahi\s+hua|deliver\s+nahi\s+hua", "order has not been delivered yet"),
         (r"delivery\s+nahi\s+hui|delivery\s+nahi\s+aayi", "delivery has not arrived yet"),
         (r"order\s+nahi\s+pahuncha|nahi\s+pahuncha", "order has not reached / arrived yet"),
         (r"receive\s+nahi\s+hua|nahi\s+mila|nahi\s+aaya", "not received / not arrived yet"),
+        (r"kab\s+tak\s+aayegi|kab\s+tak\s+aayega|kab\s+aayega|kab\s+milega", "when will it arrive"),
+        (r"wapas\s+nahi\s+aaya|wapas\s+nahi\s+mila", "has not returned / been refunded"),
         (r"abhi\s+tak", "yet / so far"),
         (r"do\s+baar\s+cut\s+gaya", "deducted twice"),
         (r"order\s+mein\s+problem\s+hai", "there is a problem with the order"),
         (r"login\s+nahi\s+ho\s+raha", "login is not working"),
-        (r"kab\s+tak\s+aayegi|kab\s+aayega", "when will it arrive"),
         (r"toota\s+hua\s+nikla", "turned out broken"),
         (r"turant\s+refund\s+chahiye", "need immediate refund"),
         (r"cancel\s+kardo|cancel\s+karna", "please cancel"),
@@ -355,10 +406,48 @@ def translate_to_english(message: str, detected_lang: str) -> str:
         for pat, rep in hindi_phrases:
             translated = re.sub(pat, rep, translated, flags=re.IGNORECASE)
 
-    if detected_lang == "Mixed/Unclear" or translated == clean_msg:
-        return f"{translated} [Translation uncertain: message contains ambiguous code-mixed phrasing]"
+    # 3. Word-by-word fallback replacement if still untranslated
+    if translated == clean_msg:
+        words = clean_msg.split()
+        lexicon = {}
+        if detected_lang == "Hinglish":
+            lexicon = HINDI_LEXICON
+        elif detected_lang == "Telugu + English":
+            lexicon = TELUGU_LEXICON
+        elif detected_lang == "Tanglish":
+            lexicon = TAMIL_LEXICON
+        
+        replaced_words = []
+        any_replaced = False
+        for w in words:
+            w_clean = re.sub(r"[^\w]", "", w.lower())
+            if w_clean in lexicon:
+                replaced_words.append(lexicon[w_clean])
+                any_replaced = True
+            else:
+                replaced_words.append(w)
+        
+        if any_replaced:
+            candidate = " ".join(replaced_words)
+            # Polish and smooth candidate
+            candidate = re.sub(r"\s+", " ", candidate).strip()
+            translated = candidate[0].upper() + candidate[1:] if candidate else candidate
 
-    return translated.strip()
+    # 4. Uncertainty check only for genuinely unparseable gibberish
+    if detected_lang == "Mixed/Unclear" or translated == clean_msg:
+        # Check if message contains recognizable keywords
+        has_indic_clue = bool(re.search(r"(order|refund|delivery|payment|damage|login|otp|paisa|kavali|venum|nahi|hua|aaya)", clean_msg, re.I))
+        if not has_indic_clue:
+            return f"{translated} [Translation uncertain: message contains ambiguous code-mixed phrasing]"
+
+    # Smooth the final translation string
+    translated = re.sub(r"\s+", " ", translated).strip()
+    if translated and translated[0].islower():
+        translated = translated[0].upper() + translated[1:]
+    if not translated.endswith((".", "!", "?")):
+        translated += "."
+
+    return translated
 
 
 def translate_agent_reply(english_text: str, target_lang: str) -> str:

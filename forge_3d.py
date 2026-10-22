@@ -12,7 +12,7 @@ Implements:
    - S4 -> S5: Dispatch & Agent Beacon (Hermes the Dispatch Automaton -> ACCEPT)
 2. Interactive WebGL Three.js 3D Forge Visualization with animated creatures,
    traveling prompt packet crystal, ember particles, and station HUD.
-3. Free-navigation derivation table generator.
+3. Free-navigation derivation table generator with full bot responsibility explanations.
 """
 
 import json
@@ -34,7 +34,8 @@ CREATURES = {
         "station": "Lexical Smelter & Script Ingestion",
         "action": "SHIFT",
         "role": "Scans raw character stream, extracts script (Latin / Devanagari / Telugu / Tamil), and tokenizes words into lexical stack.",
-        "color": "#f97316"
+        "color": "#16a34a",
+        "badge": "Station 1 • Lexical Tokenizer"
     },
     2: {
         "id": "gildor",
@@ -44,7 +45,8 @@ CREATURES = {
         "station": "Dialect & Code-Mix Anvil",
         "action": "REDUCE",
         "role": "Cross-references Indic code-mix dictionaries, determines dialect ratio (Hinglish / Tanglish / Tenglish / English).",
-        "color": "#10b981"
+        "color": "#10b981",
+        "badge": "Station 2 • Dialect Identifier"
     },
     3: {
         "id": "brog",
@@ -54,7 +56,8 @@ CREATURES = {
         "station": "Semantic Translation Crucible",
         "action": "REDUCE",
         "role": "Pounds code-mixed phrases on his anvil into normalized, grammatically coherent English semantics.",
-        "color": "#38bdf8"
+        "color": "#0284c7",
+        "badge": "Station 3 • Semantic Translator"
     },
     4: {
         "id": "pyra",
@@ -64,7 +67,8 @@ CREATURES = {
         "station": "Intent & Urgency Gem-Cutter",
         "action": "REDUCE",
         "role": "Reflects customer emotion through an illuminated crystal prism, classifying Intent, Urgency, and Calibrated Confidence.",
-        "color": "#ec4899"
+        "color": "#ea580c",
+        "badge": "Station 4 • Intent & Urgency Classifier"
     },
     5: {
         "id": "hermes",
@@ -74,7 +78,8 @@ CREATURES = {
         "station": "Dispatch & Agent Beacon",
         "action": "ACCEPT",
         "role": "Synthesizes final localized agent reply draft and routes ticket to specialized human queue or autonomous resolution.",
-        "color": "#eab308"
+        "color": "#84cc16",
+        "badge": "Station 5 • Response Synthesizer & Routing (ACCEPT)"
     }
 }
 
@@ -82,7 +87,7 @@ CREATURES = {
 def derive_parser_pipeline(message: str) -> dict:
     """
     Executes the full triage analysis and derives the 5 discrete bottom-up parser states.
-    Returns derivation steps, token metadata, and final synthesis.
+    Returns derivation steps, token metadata, bot explanations, and final synthesis.
     """
     raw_msg = (message or "").strip()
     if not raw_msg:
@@ -116,7 +121,7 @@ def derive_parser_pipeline(message: str) -> dict:
     else:
         script_label = "Latin / Romanized Script"
 
-    # Step-by-step state derivation records
+    # Step-by-step state derivation records with in-depth bot responsibility explanations
     steps = [
         {
             "step": 1,
@@ -124,6 +129,7 @@ def derive_parser_pipeline(message: str) -> dict:
             "creature": CREATURES[1]["name"],
             "title": CREATURES[1]["title"],
             "station": CREATURES[1]["station"],
+            "avatar": CREATURES[1]["avatar"],
             "action": "SHIFT",
             "stack": f"[$] · Ingesting {len(tokens)} tokens",
             "input_buffer": f"\"{raw_msg}\"",
@@ -134,7 +140,8 @@ def derive_parser_pipeline(message: str) -> dict:
                 "token_count": len(tokens),
                 "char_count": len(raw_msg)
             },
-            "summary": f"Vulcan melted input into {len(tokens)} lexical tokens in {script_label}."
+            "summary": f"Vulcan melted input into {len(tokens)} lexical tokens in {script_label}.",
+            "bot_explanation": f"I am Vulcan, the Smelter Golem at Station 1! My responsibility is Lexical Ingestion and Script Identification. When a customer sends a message, I melt the raw character stream down into clean lexical tokens and inspect character encodings. For your prompt ('{raw_msg}'), I extracted {len(tokens)} tokens and identified {script_label}. I shifted these onto the stack for Gildor to inspect!"
         },
         {
             "step": 2,
@@ -142,6 +149,7 @@ def derive_parser_pipeline(message: str) -> dict:
             "creature": CREATURES[2]["name"],
             "title": CREATURES[2]["title"],
             "station": CREATURES[2]["station"],
+            "avatar": CREATURES[2]["avatar"],
             "action": "REDUCE",
             "stack": f"[S1, Tokens, {script_label}]",
             "input_buffer": f"Dialect matching over {len(tokens)} tokens",
@@ -151,7 +159,8 @@ def derive_parser_pipeline(message: str) -> dict:
                 "dialect_confidence": f"{int(confidence * 100)}%",
                 "code_mix_type": "Code-Mixed Romanized" if "Latin" in script_label and detected_lang != "English" else "Native / Standard"
             },
-            "summary": f"Gildor matched dialect as '{detected_lang}' using Indic vocabulary heuristics."
+            "summary": f"Gildor matched dialect as '{detected_lang}' using Indic vocabulary heuristics.",
+            "bot_explanation": f"Hehehe! I am Gildor, the Dialect Imp at Station 2! My responsibility is Dialect and Code-Mix Analysis. I pass Vulcan's tokens through my enchanted scanning lens, comparing them against our Indic vocabulary matrix. In your message, I identified code-mixed linguistic patterns and classified the primary dialect as {detected_lang} ({int(confidence * 100)}% calibrated score). Next stop: Brog's anvil!"
         },
         {
             "step": 3,
@@ -159,6 +168,7 @@ def derive_parser_pipeline(message: str) -> dict:
             "creature": CREATURES[3]["name"],
             "title": CREATURES[3]["title"],
             "station": CREATURES[3]["station"],
+            "avatar": CREATURES[3]["avatar"],
             "action": "REDUCE",
             "stack": f"[S2, Dialect({detected_lang})]",
             "input_buffer": f"\"{raw_msg}\"",
@@ -168,7 +178,8 @@ def derive_parser_pipeline(message: str) -> dict:
                 "detected_language": detected_lang,
                 "english_translation": translation
             },
-            "summary": f"Brog hammered the code-mixed phrasing into: \"{translation}\""
+            "summary": f"Brog hammered the code-mixed phrasing into: \"{translation}\"",
+            "bot_explanation": f"By the forge hammer! I am Brog, the Blacksmith Dwarf at Station 3! My responsibility is Semantic Translation into Standard English. Code-mixed phrasing like '{raw_msg}' has informal colloquial structures. I strike these words on my anvil to forge a standardized, unambiguous English meaning: '{translation}'. Now downstream teams and agents know the exact customer situation!"
         },
         {
             "step": 4,
@@ -176,6 +187,7 @@ def derive_parser_pipeline(message: str) -> dict:
             "creature": CREATURES[4]["name"],
             "title": CREATURES[4]["title"],
             "station": CREATURES[4]["station"],
+            "avatar": CREATURES[4]["avatar"],
             "action": "REDUCE",
             "stack": f"[S3, EnglishSemantic]",
             "input_buffer": f"\"{translation}\"",
@@ -187,7 +199,8 @@ def derive_parser_pipeline(message: str) -> dict:
                 "escalate": escalate,
                 "escalation_reason": escalation_reason
             },
-            "summary": f"Pyra classified Intent as '{intent}' with {urgency.upper()} urgency ({int(confidence * 100)}% calibrated confidence)."
+            "summary": f"Pyra classified Intent as '{intent}' with {urgency.upper()} urgency ({int(confidence * 100)}% calibrated confidence).",
+            "bot_explanation": f"I am Pyra, the Urgency Sprite at Station 4! My responsibility is Intent Classification & Urgency Assessment. I channel the translated English meaning through my illuminated prism. I recognized the customer's core problem as '{intent}' and assigned an urgency of {urgency.upper()} with {int(confidence * 100)}% confidence. This determines SLA priority and routing!"
         },
         {
             "step": 5,
@@ -195,6 +208,7 @@ def derive_parser_pipeline(message: str) -> dict:
             "creature": CREATURES[5]["name"],
             "title": CREATURES[5]["title"],
             "station": CREATURES[5]["station"],
+            "avatar": CREATURES[5]["avatar"],
             "action": "ACCEPT",
             "stack": f"[S4, Intent({intent}), Urgency({urgency.upper()})]",
             "input_buffer": "[$]",
@@ -204,7 +218,8 @@ def derive_parser_pipeline(message: str) -> dict:
                 "dispatch_route": "Human Specialist Queue" if escalate else "Autonomous AI Resolution",
                 "status": "ACCEPT (Triage Complete)"
             },
-            "summary": f"Hermes synthesized customer reply draft and accepted state for final delivery."
+            "summary": f"Hermes synthesized customer reply draft and accepted state for final delivery.",
+            "bot_explanation": f"Dispatch sequence activated! I am Hermes, the Dispatch Automaton at Station 5! My responsibility is Contextual Response Synthesis and Ticket Dispatch. I synthesize a tailored reply draft adapted to the customer's dialect: '{draft_reply}'. I illuminate the beacon beam to mark the final bottom-up parse state: ACCEPT!"
         }
     ]
 
@@ -218,13 +233,13 @@ def derive_parser_pipeline(message: str) -> dict:
 
 
 # -----------------------------------------------------------------------------
-# 2. WebGL Three.js 3D Workstation Forge Canvas Generator
+# 2. WebGL Three.js 3D Workstation Forge Canvas Generator (Veltrix Themed)
 # -----------------------------------------------------------------------------
 
 def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
     """
-    Renders the interactive 3D WebGL scene with 5 workstation islands, animated creatures,
-    floating magma embers, connecting energy rails, and traveling prompt packet.
+    Renders the interactive 3D WebGL scene matching the Veltrix soft sage/mint + white aesthetic,
+    with 5 workstation islands, animated creatures, floating embers, and live bot voice speech popups.
     """
     pipeline_data = derive_parser_pipeline(message)
     json_pipeline = json.dumps(pipeline_data)
@@ -234,7 +249,7 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexAI 3D Workstation Forge</title>
+    <title>Veltrix 3D Workstation Forge</title>
     <style>
         * {{
             box-sizing: border-box;
@@ -247,9 +262,9 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background: #080a0f;
+            background: #f1f5f2;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: #f1f5f9;
+            color: #1e293b;
         }}
         #canvas-container {{
             width: 100%;
@@ -259,7 +274,7 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
             left: 0;
             z-index: 1;
         }}
-        /* HUD Top Bar */
+        /* Veltrix Top HUD */
         .hud-top {{
             position: absolute;
             top: 14px;
@@ -270,56 +285,96 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
             justify-content: space-between;
             align-items: flex-start;
             pointer-events: none;
+            gap: 12px;
         }}
         .hud-card {{
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(249, 115, 22, 0.35);
-            border-radius: 10px;
-            padding: 10px 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(249, 115, 22, 0.15);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid #e2ebe3;
+            border-radius: 16px;
+            padding: 12px 18px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             pointer-events: auto;
         }}
         .hud-title {{
             font-size: 0.72rem;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            color: #fb923c;
+            color: #15803d;
             font-weight: 700;
             margin-bottom: 3px;
         }}
         .hud-value {{
             font-size: 1.05rem;
             font-weight: 700;
-            color: #f8fafc;
+            color: #111827;
         }}
         .hud-sub {{
             font-size: 0.8rem;
-            color: #94a3b8;
+            color: #64748b;
             margin-top: 2px;
         }}
-        /* Bottom Controls Bar */
+        /* Bot Speech Bubble */
+        .bot-speech-card {{
+            position: absolute;
+            bottom: 64px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            max-width: 680px;
+            width: calc(100% - 32px);
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1.5px solid #86efac;
+            border-radius: 16px;
+            padding: 12px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            pointer-events: auto;
+            transition: all 0.3s ease;
+        }}
+        .speech-header {{
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }}
+        .speech-badge {{
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+            border-radius: 9999px;
+            padding: 2px 8px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }}
+        .speech-text {{
+            font-size: 0.86rem;
+            color: #334155;
+            line-height: 1.5;
+        }}
+        /* Veltrix Bottom Controls Bar */
         .hud-bottom {{
             position: absolute;
-            bottom: 14px;
+            bottom: 12px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
             display: flex;
             gap: 8px;
             align-items: center;
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            border: 1px solid #e2ebe3;
             border-radius: 9999px;
             padding: 6px 14px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
         }}
         .hud-btn {{
-            background: #1e293b;
-            color: #f1f5f9;
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: #f1f5f2;
+            color: #334155;
+            border: 1px solid #e2ebe3;
             border-radius: 20px;
             padding: 6px 14px;
             font-size: 0.8rem;
@@ -331,36 +386,23 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
             gap: 6px;
         }}
         .hud-btn:hover {{
-            background: #f97316;
-            color: #fff;
-            border-color: #fb923c;
-            box-shadow: 0 0 12px rgba(249, 115, 22, 0.5);
+            background: #dcfce7;
+            color: #15803d;
+            border-color: #86efac;
             transform: translateY(-1px);
         }}
         .hud-btn.active {{
-            background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
-            border-color: #fdba74;
-            color: #fff;
-            box-shadow: 0 0 14px rgba(249, 115, 22, 0.6);
+            background: #dcfce7;
+            border-color: #86efac;
+            color: #15803d;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
         }}
         .station-indicator {{
             font-size: 0.76rem;
-            color: #fdba74;
+            color: #15803d;
+            font-weight: 700;
             padding: 0 4px;
-        }}
-        /* Instructions Overlay */
-        .instruction-tag {{
-            position: absolute;
-            bottom: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9;
-            font-size: 0.76rem;
-            color: #64748b;
-            background: rgba(8, 10, 15, 0.7);
-            padding: 4px 12px;
-            border-radius: 12px;
-            pointer-events: none;
         }}
     </style>
     <!-- Three.js and OrbitControls via CDN -->
@@ -372,19 +414,29 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
 
     <!-- Top HUD -->
     <div class="hud-top">
-        <div class="hud-card" style="max-width: 380px;">
-            <div class="hud-title" id="hud-station-tag">Station 5: Dispatch & Beacon</div>
-            <div class="hud-value" id="hud-creature-tag">Hermes the Dispatch Automaton</div>
+        <div class="hud-card" style="max-width: 400px;">
+            <div class="hud-title" id="hud-station-tag">Station 5 • Dispatch Beacon</div>
+            <div class="hud-value" id="hud-creature-tag">📜 Hermes the Dispatch Automaton</div>
             <div class="hud-sub" id="hud-production-tag">TriageState → DraftReply ⊕ DispatchTarget (ACCEPT)</div>
         </div>
-        <div class="hud-card" style="text-align: right; max-width: 320px;">
-            <div class="hud-title">Prompt Packet</div>
-            <div class="hud-value" style="font-size: 0.95rem; color: #38bdf8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="hud-prompt-msg">"{html.escape(pipeline_data['message'])}"</div>
-            <div class="hud-sub" id="hud-status-badge" style="color: #4ade80; font-weight: 600;">Status: ACCEPT Complete</div>
+        <div class="hud-card" style="text-align: right; max-width: 340px;">
+            <div class="hud-title">Active Customer Prompt</div>
+            <div class="hud-value" style="font-size: 0.95rem; color: #15803d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="hud-prompt-msg">"{html.escape(pipeline_data['message'])}"</div>
+            <div class="hud-sub" id="hud-status-badge" style="color: #16a34a; font-weight: 700;">● State: ACCEPT Complete</div>
         </div>
     </div>
 
-    <div class="instruction-tag">🖱️ Left-click + drag to rotate • Scroll to zoom • Click buttons to jump workstations</div>
+    <!-- Live Bot Responsibility Explainer Card -->
+    <div class="bot-speech-card" id="bot-speech-card">
+        <div class="speech-header">
+            <span id="speech-avatar" style="font-size: 1.25rem;">📜</span>
+            <b id="speech-bot-name" style="color: #111827; font-size: 0.9rem;">Hermes the Dispatch Automaton</b>
+            <span class="speech-badge" id="speech-station-badge">Station 5 Responsibility</span>
+        </div>
+        <div class="speech-text" id="speech-text">
+            Loading bot report...
+        </div>
+    </div>
 
     <!-- Bottom Controls -->
     <div class="hud-bottom">
@@ -393,7 +445,7 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
         <span class="station-indicator" id="step-counter">Step 5 of 5</span>
         <button class="hud-btn" id="btn-next">Next ⏭</button>
         <button class="hud-btn" id="btn-reset">🔄 Reset</button>
-        <div style="width: 1px; height: 18px; background: rgba(255,255,255,0.2); margin: 0 4px;"></div>
+        <div style="width: 1px; height: 18px; background: #e2ebe3; margin: 0 4px;"></div>
         <button class="hud-btn" onclick="jumpToStation(1)">S1: Vulcan</button>
         <button class="hud-btn" onclick="jumpToStation(2)">S2: Gildor</button>
         <button class="hud-btn" onclick="jumpToStation(3)">S3: Brog</button>
@@ -405,10 +457,11 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
         const pipelineData = {json_pipeline};
         const steps = pipelineData.steps;
 
-        // --- 1. Three.js Scene Setup ---
+        // --- 1. Three.js Scene Setup (Veltrix Light Environment) ---
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x080a0f, 0.018);
+        scene.background = new THREE.Color(0xf1f5f2);
+        scene.fog = new THREE.FogExp2(0xf1f5f2, 0.012);
 
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 18, 38);
@@ -428,20 +481,20 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
         controls.maxDistance = 65;
 
         // --- 2. Lighting ---
-        const ambientLight = new THREE.AmbientLight(0x1e293b, 1.2);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.4);
         scene.add(ambientLight);
 
-        const forgeSun = new THREE.DirectionalLight(0xff7700, 1.6);
-        forgeSun.position.set(10, 30, 20);
-        forgeSun.castShadow = true;
-        scene.add(forgeSun);
+        const mainSun = new THREE.DirectionalLight(0xffffff, 1.2);
+        mainSun.position.set(15, 35, 25);
+        mainSun.castShadow = true;
+        scene.add(mainSun);
 
-        const blueRimLight = new THREE.DirectionalLight(0x38bdf8, 0.9);
-        blueRimLight.position.set(-20, 20, -15);
-        scene.add(blueRimLight);
+        const mintFillLight = new THREE.DirectionalLight(0x86efac, 0.6);
+        mintFillLight.position.set(-20, 20, -15);
+        scene.add(mintFillLight);
 
-        // --- 3. Magma Ember Floating Particles ---
-        const particleCount = 450;
+        // --- 3. Sage Mint Floating Particles ---
+        const particleCount = 280;
         const particleGeometry = new THREE.BufferGeometry();
         const particlePositions = new Float32Array(particleCount * 3);
         const particleSpeeds = new Float32Array(particleCount);
@@ -450,61 +503,59 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
             particlePositions[i * 3] = (Math.random() - 0.5) * 60;
             particlePositions[i * 3 + 1] = Math.random() * 25 - 5;
             particlePositions[i * 3 + 2] = (Math.random() - 0.5) * 40;
-            particleSpeeds[i] = 0.02 + Math.random() * 0.035;
+            particleSpeeds[i] = 0.015 + Math.random() * 0.025;
         }}
         particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
         const particleMaterial = new THREE.PointsMaterial({{
-            color: 0xf97316,
-            size: 0.35,
+            color: 0x22c55e,
+            size: 0.32,
             transparent: true,
-            opacity: 0.75,
-            blending: THREE.AdditiveBlending
+            opacity: 0.55
         }});
         const emberParticles = new THREE.Points(particleGeometry, particleMaterial);
         scene.add(emberParticles);
 
-        // --- 4. Central Citadel Platform & Magma Veins ---
-        const citadelGeo = new THREE.CylinderGeometry(23, 25, 2, 40);
+        // --- 4. Central Platform & Rails ---
+        const citadelGeo = new THREE.CylinderGeometry(23, 25, 1.6, 40);
         const citadelMat = new THREE.MeshStandardMaterial({{
-            color: 0x0f172a,
-            roughness: 0.75,
-            metalness: 0.3
+            color: 0xffffff,
+            roughness: 0.4,
+            metalness: 0.1
         }});
         const citadel = new THREE.Mesh(citadelGeo, citadelMat);
         citadel.position.y = -1.5;
         citadel.receiveShadow = true;
         scene.add(citadel);
 
-        // Molten ring
-        const lavaRingGeo = new THREE.TorusGeometry(22, 0.45, 16, 60);
-        const lavaRingMat = new THREE.MeshBasicMaterial({{ color: 0xea580c }});
+        // Mint Ring around Platform
+        const lavaRingGeo = new THREE.TorusGeometry(22, 0.35, 16, 60);
+        const lavaRingMat = new THREE.MeshBasicMaterial({{ color: 0x86efac }});
         const lavaRing = new THREE.Mesh(lavaRingGeo, lavaRingMat);
         lavaRing.rotation.x = Math.PI / 2;
-        lavaRing.position.y = -0.4;
+        lavaRing.position.y = -0.55;
         scene.add(lavaRing);
 
         // --- 5. Five Workstation Islands ---
         const stationCoords = [
-            {{ x: -16, y: 0, z: 2, name: "Vulcan", color: 0xf97316 }},
+            {{ x: -16, y: 0, z: 2, name: "Vulcan", color: 0x16a34a }},
             {{ x: -8,  y: 0, z: -3, name: "Gildor", color: 0x10b981 }},
-            {{ x: 0,   y: 0, z: -5, name: "Brog",   color: 0x38bdf8 }},
-            {{ x: 8,   y: 0, z: -3, name: "Pyra",   color: 0xec4899 }},
-            {{ x: 16,  y: 0, z: 2, name: "Hermes", color: 0xeab308 }}
+            {{ x: 0,   y: 0, z: -5, name: "Brog",   color: 0x0284c7 }},
+            {{ x: 8,   y: 0, z: -3, name: "Pyra",   color: 0xea580c }},
+            {{ x: 16,  y: 0, z: 2, name: "Hermes", color: 0x84cc16 }}
         ];
 
         const stationGroups = [];
-        const islandPlates = [];
 
         stationCoords.forEach((st, idx) => {{
             const group = new THREE.Group();
             group.position.set(st.x, st.y, st.z);
 
-            // Island base pedestal
+            // Island base pedestal (crisp white)
             const baseGeo = new THREE.CylinderGeometry(3.2, 3.8, 1.2, 24);
             const baseMat = new THREE.MeshStandardMaterial({{
-                color: 0x1e293b,
-                roughness: 0.5,
-                metalness: 0.4
+                color: 0xffffff,
+                roughness: 0.3,
+                metalness: 0.1
             }});
             const baseMesh = new THREE.Mesh(baseGeo, baseMat);
             baseMesh.position.y = 0.6;
@@ -528,7 +579,7 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
             stationGroups.push({{ group, light, ringMesh, coords: st }});
         }});
 
-        // --- 6. Energy Rails connecting Station 1 to 5 ---
+        // Energy Rails connecting Station 1 to 5
         for (let i = 0; i < stationCoords.length - 1; i++) {{
             const p1 = stationCoords[i];
             const p2 = stationCoords[i + 1];
@@ -541,15 +592,15 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
 
             const tubeGeo = new THREE.TubeGeometry(curve, 20, 0.1, 8, false);
             const tubeMat = new THREE.MeshBasicMaterial({{
-                color: 0xf97316,
+                color: 0x22c55e,
                 transparent: true,
-                opacity: 0.65
+                opacity: 0.6
             }});
             const tube = new THREE.Mesh(tubeGeo, tubeMat);
             scene.add(tube);
         }}
 
-        // --- 7. The 5 Animated Tiny Creatures ---
+        // --- 6. The 5 Animated Tiny Creatures ---
         const creatures = [];
 
         // Creature 1: Vulcan (Smelter Golem) - Station 1
@@ -558,30 +609,26 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
             const cGroup = new THREE.Group();
             cGroup.position.set(0, 1.3, 0);
 
-            // Heavy basalt body
             const bodyGeo = new THREE.DodecahedronGeometry(1.2, 0);
-            const bodyMat = new THREE.MeshStandardMaterial({{ color: 0x78350f, roughness: 0.7 }});
+            const bodyMat = new THREE.MeshStandardMaterial({{ color: 0x166534, roughness: 0.5 }});
             const body = new THREE.Mesh(bodyGeo, bodyMat);
             body.position.y = 1.3;
             cGroup.add(body);
 
-            // Fiery core
             const eyeGeo = new THREE.SphereGeometry(0.2, 8, 8);
-            const eyeMat = new THREE.MeshBasicMaterial({{ color: 0xf97316 }});
+            const eyeMat = new THREE.MeshBasicMaterial({{ color: 0x86efac }});
             const eye = new THREE.Mesh(eyeGeo, eyeMat);
             eye.position.set(0, 1.6, 0.9);
             cGroup.add(eye);
 
-            // Smelter crucible in front
             const potGeo = new THREE.CylinderGeometry(0.9, 0.7, 0.9, 16);
-            const potMat = new THREE.MeshStandardMaterial({{ color: 0x27272a, roughness: 0.4 }});
+            const potMat = new THREE.MeshStandardMaterial({{ color: 0x334155, roughness: 0.4 }});
             const pot = new THREE.Mesh(potGeo, potMat);
             pot.position.set(0, 0.45, 1.4);
             cGroup.add(pot);
 
-            // Lava inside pot
             const lavaGeo = new THREE.CircleGeometry(0.85, 16);
-            const lavaMat = new THREE.MeshBasicMaterial({{ color: 0xea580c }});
+            const lavaMat = new THREE.MeshBasicMaterial({{ color: 0x22c55e }});
             const lava = new THREE.Mesh(lavaGeo, lavaMat);
             lava.rotation.x = -Math.PI / 2;
             lava.position.set(0, 0.91, 1.4);
@@ -597,22 +644,19 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
             const cGroup = new THREE.Group();
             cGroup.position.set(0, 2.0, 0);
 
-            // Slender emerald body
             const bodyGeo = new THREE.OctahedronGeometry(0.8, 0);
             const bodyMat = new THREE.MeshStandardMaterial({{ color: 0x059669, roughness: 0.3, metalness: 0.4 }});
             const body = new THREE.Mesh(bodyGeo, bodyMat);
             cGroup.add(body);
 
-            // Scanning lens ring
             const lensGeo = new THREE.TorusGeometry(0.9, 0.08, 8, 24);
             const lensMat = new THREE.MeshBasicMaterial({{ color: 0x34d399 }});
             const lens = new THREE.Mesh(lensGeo, lensMat);
             lens.position.set(0, 0, 0.8);
             cGroup.add(lens);
 
-            // Wings
             const wingGeo = new THREE.PlaneGeometry(1.2, 0.6);
-            const wingMat = new THREE.MeshBasicMaterial({{ color: 0x6ee7b7, side: THREE.DoubleSide, transparent: true, opacity: 0.7 }});
+            const wingMat = new THREE.MeshBasicMaterial({{ color: 0x6ee7b7, side: THREE.DoubleSide, transparent: true, opacity: 0.75 }});
             const leftWing = new THREE.Mesh(wingGeo, wingMat);
             leftWing.position.set(-0.9, 0.2, -0.3);
             leftWing.rotation.y = -Math.PI / 4;
@@ -633,32 +677,28 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
             const cGroup = new THREE.Group();
             cGroup.position.set(0, 1.2, 0);
 
-            // Dwarf torso & helmet
             const torsoGeo = new THREE.CylinderGeometry(0.7, 0.8, 1.3, 8);
-            const torsoMat = new THREE.MeshStandardMaterial({{ color: 0x475569, metalness: 0.8, roughness: 0.3 }});
+            const torsoMat = new THREE.MeshStandardMaterial({{ color: 0x0369a1, metalness: 0.8, roughness: 0.3 }});
             const torso = new THREE.Mesh(torsoGeo, torsoMat);
             torso.position.y = 0.8;
             cGroup.add(torso);
 
-            // Helmet with horns
             const helmGeo = new THREE.ConeGeometry(0.8, 0.7, 8);
-            const helmMat = new THREE.MeshStandardMaterial({{ color: 0x94a3b8, metalness: 0.9 }});
+            const helmMat = new THREE.MeshStandardMaterial({{ color: 0x38bdf8, metalness: 0.9 }});
             const helm = new THREE.Mesh(helmGeo, helmMat);
             helm.position.y = 1.7;
             cGroup.add(helm);
 
-            // Iron Anvil in front
             const anvilBaseGeo = new THREE.BoxGeometry(1.6, 0.8, 1.0);
             const anvilMat = new THREE.MeshStandardMaterial({{ color: 0x1e293b, metalness: 0.9, roughness: 0.2 }});
             const anvil = new THREE.Mesh(anvilBaseGeo, anvilMat);
             anvil.position.set(0, 0.4, 1.4);
             cGroup.add(anvil);
 
-            // Hammer arm
             const armGroup = new THREE.Group();
             armGroup.position.set(0.8, 1.2, 0.3);
             const handleGeo = new THREE.CylinderGeometry(0.08, 0.08, 1.4);
-            const handleMat = new THREE.MeshStandardMaterial({{ color: 0xb45309 }});
+            const handleMat = new THREE.MeshStandardMaterial({{ color: 0x78350f }});
             const handle = new THREE.Mesh(handleGeo, handleMat);
             handle.position.y = 0.5;
             armGroup.add(handle);
@@ -680,19 +720,16 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
             const cGroup = new THREE.Group();
             cGroup.position.set(0, 2.0, 0);
 
-            // Glowing fairy core
             const coreGeo = new THREE.IcosahedronGeometry(0.7, 0);
-            const coreMat = new THREE.MeshStandardMaterial({{ color: 0xec4899, roughness: 0.2, metalness: 0.8 }});
+            const coreMat = new THREE.MeshStandardMaterial({{ color: 0xea580c, roughness: 0.2, metalness: 0.8 }});
             const core = new THREE.Mesh(coreGeo, coreMat);
             cGroup.add(core);
 
-            // Gyroscopic Ring 1
             const ring1Geo = new THREE.TorusGeometry(1.2, 0.06, 8, 32);
-            const ring1Mat = new THREE.MeshBasicMaterial({{ color: 0xf43f5e }});
+            const ring1Mat = new THREE.MeshBasicMaterial({{ color: 0xf97316 }});
             const ring1 = new THREE.Mesh(ring1Geo, ring1Mat);
             cGroup.add(ring1);
 
-            // Gyroscopic Ring 2
             const ring2Geo = new THREE.TorusGeometry(1.5, 0.06, 8, 32);
             const ring2Mat = new THREE.MeshBasicMaterial({{ color: 0xfbbf24 }});
             const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
@@ -708,23 +745,20 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
             const cGroup = new THREE.Group();
             cGroup.position.set(0, 1.8, 0);
 
-            // Clockwork brass body
             const bodyGeo = new THREE.CylinderGeometry(0.6, 0.4, 1.5, 6);
-            const bodyMat = new THREE.MeshStandardMaterial({{ color: 0xd97706, metalness: 0.9, roughness: 0.2 }});
+            const bodyMat = new THREE.MeshStandardMaterial({{ color: 0x65a30d, metalness: 0.9, roughness: 0.2 }});
             const body = new THREE.Mesh(bodyGeo, bodyMat);
             cGroup.add(body);
 
-            // Antenna
             const antGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.9);
-            const antMat = new THREE.MeshBasicMaterial({{ color: 0xfef08a }});
+            const antMat = new THREE.MeshBasicMaterial({{ color: 0x84cc16 }});
             const ant = new THREE.Mesh(antGeo, antMat);
             ant.position.y = 1.2;
             cGroup.add(ant);
 
-            // Upward beacon column
             const beamGeo = new THREE.CylinderGeometry(0.4, 0.8, 12, 16);
             const beamMat = new THREE.MeshBasicMaterial({{
-                color: 0xfacc15,
+                color: 0x22c55e,
                 transparent: true,
                 opacity: 0.35,
                 side: THREE.DoubleSide
@@ -737,11 +771,11 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
             creatures.push({{ group: cGroup, type: "hermes", ant, beam, basePos: cGroup.position.clone() }});
         }})();
 
-        // --- 8. The Traveling Prompt Packet Crystal ---
+        // --- 7. The Traveling Prompt Packet Crystal ---
         const packetGeo = new THREE.IcosahedronGeometry(0.7, 0);
         const packetMat = new THREE.MeshStandardMaterial({{
-            color: 0x38bdf8,
-            emissive: 0x0284c7,
+            color: 0x16a34a,
+            emissive: 0x15803d,
             roughness: 0.1,
             metalness: 0.9
         }});
@@ -749,10 +783,9 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
         promptPacket.castShadow = true;
         scene.add(promptPacket);
 
-        const packetLight = new THREE.PointLight(0x38bdf8, 1.8, 12);
+        const packetLight = new THREE.PointLight(0x22c55e, 1.8, 12);
         promptPacket.add(packetLight);
 
-        // Position crystal initially at Hermes (Station 5) or chosen active station
         let currentStep = {active_state};
         let isPlaying = false;
         let playTimer = null;
@@ -766,12 +799,18 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
                 promptPacket.position.copy(targetPos);
             }}
 
-            // Update HUD
+            // Update Top HUD
             const sInfo = steps[currentStep - 1];
-            document.getElementById('hud-station-tag').innerText = `Station ${{sInfo.step}}: ${{sInfo.station}}`;
-            document.getElementById('hud-creature-tag').innerText = `${{sInfo.creature}} the ${{sInfo.title}}`;
+            document.getElementById('hud-station-tag').innerText = `Station ${{sInfo.step}} • ${{sInfo.station}}`;
+            document.getElementById('hud-creature-tag').innerText = `${{sInfo.avatar}} ${{sInfo.creature}} the ${{sInfo.title}}`;
             document.getElementById('hud-production-tag').innerText = sInfo.production;
             document.getElementById('step-counter').innerText = `Step ${{currentStep}} of 5`;
+
+            // Update Live Bot Speech Bubble
+            document.getElementById('speech-avatar').innerText = sInfo.avatar;
+            document.getElementById('speech-bot-name').innerText = `${{sInfo.creature}} the ${{sInfo.title}}`;
+            document.getElementById('speech-station-badge').innerText = `Station ${{sInfo.step}} Responsibility`;
+            document.getElementById('speech-text').innerText = sInfo.bot_explanation;
 
             // Active button state
             const buttons = document.querySelectorAll('.hud-bottom .hud-btn');
@@ -815,13 +854,13 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
                     }} else {{
                         setPacketStation(1);
                     }}
-                }}, 1800);
+                }}, 2200);
             }} else {{
                 clearInterval(playTimer);
             }}
         }};
 
-        // --- 9. Animation Render Loop ---
+        // --- 8. Animation Render Loop ---
         let clock = new THREE.Clock();
 
         function animate() {{
@@ -829,10 +868,9 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
             const delta = clock.getDelta();
             const time = clock.getElapsedTime();
 
-            // OrbitControls update
             controls.update();
 
-            // Embers drift upwards
+            // Particles drift upwards
             const positions = emberParticles.geometry.attributes.position.array;
             for (let i = 0; i < particleCount; i++) {{
                 positions[i * 3 + 1] += particleSpeeds[i];
@@ -844,7 +882,7 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
 
             // Prompt Packet smooth lerp to current station
             const targetCoord = stationCoords[currentStep - 1];
-            const targetY = 3.0 + Math.sin(time * 3.5) * 0.4;
+            const targetY = 3.0 + Math.sin(time * 3.5) * 0.35;
             promptPacket.position.x += (targetCoord.x - promptPacket.position.x) * 0.08;
             promptPacket.position.z += (targetCoord.z - promptPacket.position.z) * 0.08;
             promptPacket.position.y += (targetY - promptPacket.position.y) * 0.08;
@@ -861,7 +899,6 @@ def build_threejs_forge_html(message: str, active_state: int = 5) -> str:
                     c.rightWing.rotation.z = -Math.sin(time * 12.0) * 0.4;
                     c.lens.rotation.z += 0.03;
                 }} else if (c.type === "brog") {{
-                    // Brog hammer swing
                     const swing = Math.sin(time * 4.0);
                     c.armGroup.rotation.x = swing > 0.3 ? swing * 0.9 : 0;
                 }} else if (c.type === "pyra") {{
