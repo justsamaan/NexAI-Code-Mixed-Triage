@@ -1876,40 +1876,246 @@ elif current_user.get("role") in ["agent", "admin"]:
             disp_cols = [c for c in ["id", "timestamp", "detected_language", "intent", "urgency", "confidence", "escalate", "message", "english_translation"] if c in df_sess.columns]
             st.dataframe(df_sess[disp_cols], use_container_width=True, hide_index=True)
 
-    # --- Page 4: Root-Cause Analysis (Separate from Customer Queries) ---
+    # --- Page 4: Dedicated Root-Cause Analysis & Complaint Trends Dashboard ---
     elif section == "Root-Cause Analysis":
-        st.markdown('<div class="apple-header">Root-Cause Analysis & Escalation Drivers</div>', unsafe_allow_html=True)
-        st.markdown('<div class="apple-sub">Diagnostic insights into escalation origins, customer friction points, and code-mixed dialect ambiguity.</div>', unsafe_allow_html=True)
+        # Navigation header
+        top_h1, top_h2 = st.columns([4, 1.5])
+        with top_h1:
+            st.markdown('<div class="apple-header">Root-Cause Analysis & Complaint Trends</div>', unsafe_allow_html=True)
+            st.markdown('<div class="apple-sub">Executive intelligence console for identifying recurring complaint patterns, spike anomalies, and process bottlenecks.</div>', unsafe_allow_html=True)
+        with top_h2:
+            st.markdown("<br>", unsafe_allow_html=True)
+            if st.button("⬅️ Customer Queries Inbox", key="btn_nav_inbox", use_container_width=True):
+                st.session_state["nav_radio_idx"] = 0
+                st.toast("Navigating to Customer Queries...")
+                # Update query param or rerun
 
-        rc = database.get_root_cause_analysis()
+        # ---------------------------------------------------------------------
+        # 1. Filters & Aggregation Controls
+        # ---------------------------------------------------------------------
+        with st.container():
+            st.markdown("##### 🔍 Dashboard Filters & Period View")
+            f1, f2, f3, f4, f5 = st.columns([1.5, 1.2, 1.5, 1.2, 1.5])
+            with f1:
+                date_preset = st.selectbox(
+                    "Date Range:",
+                    options=["All Time", "Last 7 Days", "Last 14 Days", "Last 30 Days"],
+                    index=0,
+                    key="rca_date_preset"
+                )
+            with f2:
+                view_mode = st.radio("Aggregation:", ["Daily", "Weekly"], horizontal=True, key="rca_view_mode")
+            with f3:
+                flt_intent_rc = st.selectbox("Intent:", ["All"] + ai_engine.VALID_INTENTS, key="rca_flt_intent")
+            with f4:
+                flt_urg_rc = st.selectbox("Urgency:", ["All", "High", "Medium", "Low"], key="rca_flt_urg")
+            with f5:
+                flt_lang_rc = st.selectbox("Dialect:", ["All"] + database.ALL_SUPPORTED_LANGUAGES, key="rca_flt_lang")
 
-        rc_col1, rc_col2 = st.columns(2)
-        with rc_col1:
-            st.markdown("##### Primary Escalation Drivers")
-            if rc["top_drivers"]:
-                df_drivers = pd.DataFrame(rc["top_drivers"])
-                st.dataframe(df_drivers, use_container_width=True, hide_index=True)
-            else:
-                st.info("No escalation driver data logged yet.")
+        # Compute Date Range Boundaries
+        today = datetime.date.today()
+        if date_preset == "Last 7 Days":
+            start_date_str = (today - datetime.timedelta(days=7)).isoformat()
+            end_date_str = today.isoformat()
+        elif date_preset == "Last 14 Days":
+            start_date_str = (today - datetime.timedelta(days=14)).isoformat()
+            end_date_str = today.isoformat()
+        elif date_preset == "Last 30 Days":
+            start_date_str = (today - datetime.timedelta(days=30)).isoformat()
+            end_date_str = today.isoformat()
+        else:  # All Time
+            start_date_str = None
+            end_date_str = None
 
-        with rc_col2:
-            st.markdown("##### Escalation Rate by Dialect")
-            if rc["language_escalations"]:
-                df_lang_esc = pd.DataFrame(rc["language_escalations"])
-                st.dataframe(df_lang_esc, use_container_width=True, hide_index=True)
-            else:
-                st.info("No dialect breakdown available.")
+        # Fetch Data from Database Engine
+        rc_data = database.get_root_cause_dashboard_data(
+            start_date=start_date_str,
+            end_date=end_date_str,
+            filter_intent=flt_intent_rc if flt_intent_rc != "All" else None,
+            filter_urgency=flt_urg_rc if flt_urg_rc != "All" else None,
+            filter_language=flt_lang_rc if flt_lang_rc != "All" else None,
+            view_mode=view_mode.lower()
+        )
 
         st.divider()
 
-        st.markdown("##### Low-Confidence Inquiries & Dialect Ambiguities (< 75% Confidence)")
-        st.caption("Cases where dialect blending or phonetic spelling caused model uncertainty, requiring human review:")
-        if rc["ambiguous_cases"]:
-            df_ambig = pd.DataFrame(rc["ambiguous_cases"])
-            st.dataframe(df_ambig, use_container_width=True, hide_index=True)
+        # Empty State Check
+        if rc_data["is_empty"]:
+            st.warning("⚠️ No customer complaints found matching the selected period and filter parameters.")
+            st.info("Tip: Switch the Date Range filter to 'All Time' or clear dialect/intent filters to inspect historical complaint data.")
         else:
-            st.info("No low-confidence ambiguity cases detected. The model maintains high confidence across current tickets.")
+            # -----------------------------------------------------------------
+            # 2. Overview Metrics
+            # -----------------------------------------------------------------
+            st.markdown("##### 📊 Complaint Volume & Performance Overview")
+            ov1, ov2, ov3, ov4, ov5, ov6, ov7 = st.columns(7)
+            with ov1:
+                st.metric("Total Complaints", rc_data["total_complaints"])
+            with ov2:
+                st.metric("Refund Issues", f"{rc_data['refund_complaints']}", f"{rc_data['refund_pct']}% of total")
+            with ov3:
+                st.metric("Delivery Issues", f"{rc_data['delivery_complaints']}", f"{rc_data['delivery_pct']}% of total")
+            with ov4:
+                st.metric("Payment Issues", f"{rc_data['payment_complaints']}", f"{rc_data['payment_pct']}% of total")
+            with ov5:
+                st.metric("Product / Wrong", f"{rc_data['damage_complaints']}", f"{rc_data['damage_pct']}% of total")
+            with ov6:
+                st.metric("Escalation Rate", f"{rc_data['escalation_rate']}%")
+            with ov7:
+                st.metric("Resolution Rate", f"{rc_data['resolution_rate']}%")
 
+            st.divider()
+
+            # -----------------------------------------------------------------
+            # 3. Explainable Spike Detection & Anomaly Alerts
+            # -----------------------------------------------------------------
+            st.markdown("##### 🚨 Complaint Spike & Anomaly Baseline Detection")
+            for alert in rc_data["spike_alerts"]:
+                atype = alert.get("type", "info")
+                amsg = alert.get("message", "")
+                acat = alert.get("category", "Monitoring")
+                if atype == "warning":
+                    st.markdown(f"""
+                    <div class="escalate-banner">
+                        <strong style="color: #d70015; font-size: 1rem;">⚠️ ANOMALOUS SPIKE DETECTED &nbsp;•&nbsp; {acat}</strong>
+                        <div style="font-size: 0.92rem; margin-top: 4px; color: #4c0519;">{amsg}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                elif atype == "success":
+                    st.markdown(f"""
+                    <div class="no-escalate-banner">
+                        <strong style="color: #1b8738; font-size: 0.95rem;">✅ {acat.upper()}</strong>
+                        <div style="font-size: 0.88rem; margin-top: 3px; color: #14532d;">{amsg}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.info(f"ℹ️ **{acat}:** {amsg}")
+
+            st.markdown("<br>", unsafe_allow_html=True)
+
+            # -----------------------------------------------------------------
+            # 4. Complaint Trends Charts
+            # -----------------------------------------------------------------
+            st.markdown(f"##### 📈 Complaint Trends ({view_mode} Aggregation)")
+            trend_list = rc_data["trend_data"]
+
+            if trend_list:
+                df_trend = pd.DataFrame(trend_list).set_index("period")
+
+                ch_c1, ch_c2 = st.columns(2)
+                with ch_c1:
+                    st.markdown("**Total Inquiries vs Primary Drivers Over Time**")
+                    disp_cols_1 = [c for c in ["total", "delivery", "refund", "payment"] if c in df_trend.columns]
+                    st.bar_chart(df_trend[disp_cols_1])
+
+                with ch_c2:
+                    st.markdown("**Refund vs Delivery Delay Volume Trajectory**")
+                    disp_cols_2 = [c for c in ["delivery", "refund"] if c in df_trend.columns]
+                    st.line_chart(df_trend[disp_cols_2])
+
+                ch_c3, ch_c4 = st.columns(2)
+                with ch_c3:
+                    st.markdown("**Urgency Distribution Over Time (High / Medium / Low)**")
+                    disp_cols_3 = [c for c in ["urgency_high", "urgency_medium", "urgency_low"] if c in df_trend.columns]
+                    st.area_chart(df_trend[disp_cols_3])
+
+                with ch_c4:
+                    st.markdown("**Escalation vs Resolution Rate (%)**")
+                    disp_cols_4 = [c for c in ["escalation_rate", "resolution_rate"] if c in df_trend.columns]
+                    st.line_chart(df_trend[disp_cols_4])
+
+            st.divider()
+
+            # -----------------------------------------------------------------
+            # 5. Recurring Issue Clusters (Transparent Keyword & Intent Grouping)
+            # -----------------------------------------------------------------
+            st.markdown("##### 🧩 Recurring Complaint Clusters & Root-Cause Themes")
+            st.caption("Tickets grouped transparently by semantic complaint keywords, intent categories, and operational friction points:")
+
+            if not rc_data["clusters"]:
+                st.info("No recurring complaint clusters identified in the selected sample.")
+            else:
+                for cl in rc_data["clusters"]:
+                    urg_cls = f"badge-{cl['typical_urgency'].lower()}"
+                    st.markdown(f"""
+                    <div class="apple-card" style="padding: 14px 18px; margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <div>
+                                <span style="font-weight: 700; font-size: 1.05rem; color: #1d1d1f;">{cl['name']}</span>
+                                &nbsp;<span style="font-size: 0.8rem; color: #86868b;">({cl['cluster_id']})</span>
+                            </div>
+                            <div>
+                                <span class="{urg_cls}">TYPICAL: {cl['typical_urgency'].upper()}</span>
+                                &nbsp;<span style="font-size: 0.82rem; font-weight: 600; color: #d70015; background: #fee2e2; padding: 2px 8px; border-radius: 10px;">Escalation: {cl['escalation_rate']}%</span>
+                            </div>
+                        </div>
+                        <div style="font-size: 0.88rem; color: #0071e3; font-weight: 600; margin-bottom: 6px;">
+                            Theme: {cl['theme']}
+                        </div>
+                        <div style="display: flex; gap: 18px; font-size: 0.82rem; color: #6e6e73; margin-bottom: 8px;">
+                            <span>Volume: <b>{cl['count']} complaints</b></span>
+                            <span>Trend vs Baseline: <b>{cl['trend_vs_prior']}</b></span>
+                        </div>
+                        <div style="background-color: #f5f5f7; border-radius: 6px; padding: 8px 12px; font-size: 0.82rem; color: #1d1d1f;">
+                            <b>Representative Customer Excerpts:</b>
+                            <ul style="margin: 4px 0 0 16px; padding: 0;">
+                                {"".join(f"<li>{quote}</li>" for quote in cl['representative_examples'])}
+                            </ul>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+            st.divider()
+
+            # -----------------------------------------------------------------
+            # 6. Product and Process Analysis (Pattern vs Hypothesis vs Cause)
+            # -----------------------------------------------------------------
+            st.markdown("##### ⚙️ Product & Process Diagnostic Analysis")
+            st.caption("Factual delineation between observed patterns, operational hypotheses, and confirmed root causes:")
+
+            if not rc_data["product_process_patterns"]:
+                st.info("No specific product or process entities detected in current complaints.")
+            else:
+                for pat in rc_data["product_process_patterns"]:
+                    st.markdown(f"""
+                    <div class="apple-card" style="padding: 14px 18px; margin-bottom: 12px; border-left: 4px solid #0071e3;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <span style="font-weight: 700; font-size: 1.0rem; color: #1d1d1f;">{pat['entity']}</span>
+                            <span class="lang-pill">{pat['type']} • {pat['count']} tickets</span>
+                        </div>
+                        <div style="margin-top: 6px; font-size: 0.88rem;">
+                            <div style="margin-bottom: 4px;">
+                                <b style="color: #1d1d1f;">🔍 Observed Complaint Pattern:</b>
+                                <span style="color: #424245;"> {pat['observed_pattern']}</span>
+                            </div>
+                            <div style="margin-bottom: 4px;">
+                                <b style="color: #b25e00;">💡 Possible Operational Explanation:</b>
+                                <span style="color: #424245;"> {pat['possible_explanation']}</span>
+                            </div>
+                            <div>
+                                <b style="color: #1b8738;">✅ Confirmed Root Cause / Action:</b>
+                                <span style="color: #424245;"> {pat['confirmed_cause']}</span>
+                            </div>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+            st.divider()
+
+            # -----------------------------------------------------------------
+            # 7. Emerging Issues Executive Summary
+            # -----------------------------------------------------------------
+            st.markdown("##### 📌 Emerging Issues Executive Summary")
+            st.caption("Data-grounded key takeaways for customer-care managers and operations leaders:")
+
+            sum_html = "".join(f"<li style='margin-bottom: 6px; font-size: 0.92rem; color: #1d1d1f;'>{bullet}</li>" for bullet in rc_data["emerging_summary"])
+            st.markdown(f"""
+            <div style="background-color: #fbfbfd; border: 1px solid #d2d2d7; border-radius: 10px; padding: 16px 20px;">
+                <ul style="margin: 0; padding-left: 20px;">
+                    {sum_html}
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
     # --- Page 5: Evaluation Suite ---
     elif section == "🧪 Evaluation Suite":
         num_tests = len(TEST_CASES)

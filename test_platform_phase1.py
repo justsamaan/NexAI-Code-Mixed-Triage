@@ -172,7 +172,13 @@ class TestPhase1Platform(unittest.TestCase):
     def test_08_customer_feedback_persistence(self):
         """Verify customer ratings and feedback persist and feed metrics."""
         priya = database.get_user_by_username("customer")
-        conv = database.list_customer_conversations(priya["id"])[0]
+        convs = [c for c in database.list_customer_conversations(priya["id"]) if not database.get_conversation_feedback(c["id"])]
+        if not convs:
+            msg = "Feedback test query"
+            ai_res = ai_engine.analyze_message(msg)
+            conv = database.create_conversation(priya["id"], priya["name"], "Feedback Query", msg, ai_res)
+        else:
+            conv = convs[0]
         
         fb = database.submit_feedback(
             conv_id=conv["id"],

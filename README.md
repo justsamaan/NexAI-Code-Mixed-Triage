@@ -22,59 +22,44 @@ NexAI transforms customer support operations by accurately understanding, triagi
 ### A. Customer Workspace
 - **Secure Authentication & Registration**: PBKDF2-HMAC-SHA256 password hashing with unique per-user salts.
 - **Data Privacy & Isolation**: Customers can view, manage, and reply exclusively to their own conversations.
-- **Optional Language Selection**:
-  - English
-  - தமிழ் (Tamil)
-  - తెలుగు (Telugu)
-  - हिन्दी (Hindi)
-  - Auto-Detect
-  - Fast native script input chips for common queries.
-- **Live Conversation Thread**:
-  - Clean chat layout clearly distinguishing Customer, AI Assistant, Human Specialist, and System Dispatcher messages.
-  - Real-time status indicators (`Open`, `In Progress`, `Resolved`).
-  - Waiting banner when human assistance is requested.
-  - Active specialist banner when an agent joins the conversation.
-- **Post-Resolution Customer Feedback**:
-  - 1-to-5 star rating with category selection.
-  - Explanation comments.
-  - Translation quality assessment (`Excellent`, `Good`, `Needs Improvement`, `Poor`).
-  - Resolution confirmation (`Yes`, `Partially`, `No`).
-  - Strictly enforced one-review-per-conversation constraint.
+- **Optional Language Selection**: English, தமிழ் (Tamil), తెలుగు (Telugu), हिन्दी (Hindi), and Auto-Detect with fast native script input chips.
+- **Live Conversation Thread**: Clean chat layout distinguishing Customer, AI Assistant, Human Specialist, and System Dispatcher messages with waiting and joined banners.
+- **Post-Resolution Customer Feedback**: 1-to-5 star rating, explanation comment, translation quality review, and issue resolution status with enforced single submission.
 
-### B. Customer-Care Agent Workspace (Phase 3: Gmail-Inspired Ticket Inbox)
-- **Top Summary Indicators & CSAT Progress Bar**:
-  - Total received queries, resolved queries, pending queries, and active escalated flags.
-  - Interactive popover dialog detailing exact open, in-progress, resolved, and closed counts.
-  - Customer Satisfaction (CSAT) indicator with $0-100\%$ progress bar, quality badge (`Positive`, `Neutral`, `Negative`), documented formula ($\% \text{ of ratings } \ge 4\text{ stars}$), and exact sample size ($N$).
+### B. Customer-Care Agent Workspace (Phase 3: Gmail-Inspired Inbox)
+- **Top Summary Indicators & CSAT Progress Bar**: Total received, resolved, pending, and active escalated queries with popover status breakdown and CSAT progress bar ($\text{CSAT \%} = \frac{\text{Ratings } \ge 4}{\text{Total}} \times 100\%$).
 - **Gmail-Inspired 3-Area Ticket Inbox**:
-  - **Left Folder Navigation**: 7 mailboxes with live dynamic ticket counts:
-    - 📥 Inbox
-    - 👤 Unassigned
-    - 📌 Assigned to Me
-    - ⏳ Waiting for Agent
-    - 💬 Waiting for Customer
-    - 🚨 Escalated
-    - ✅ Resolved
-  - **Main Ticket List**: Compact rows showing customer name/ID, short message preview, predicted intent, urgency indicator (restrained Red/Amber/Green), calibrated AI confidence percentage ($XX\%$, distinct from urgency), status, assigned agent, and last activity timestamp.
-  - **Details Panel**: Opens alongside the inbox list in the main workspace without losing context.
-- **Deterministic Sorting & Multidimensional Filtering**:
-  - Sorting: *Latest queries first*, *Oldest queries first*, *Highest urgency first*, *Lowest confidence first*, *Most relevant*.
-  - Filters: Intent, Urgency, Status, Dialect, Assigned Agent, and Escalation status.
-  - Search: Full-text search across customer name, ticket ID, subject, English translation, and message history.
-- **Agent Action & Resolution Controls**:
-  - Edit AI-generated draft responses in English.
-  - One-click translation of draft into customer's preferred language (Telugu, Tamil, Hindi) with review and edit before dispatch.
-  - Clarification quick-template chips (Order ID request, damage photo request, payment reference request).
-  - Takeover button to assume control of an AI-handled or unassigned conversation.
-  - Ticket assignment and reassignment dropdown.
-  - Resolution toggle: mark as resolved or reopen resolved tickets.
-  - **Internal Staff Notes**: Private staff-only notes that persist in the thread and are strictly isolated from customer views.
-- **Session Analytics (Section 7)**:
-  - Real-time tracking of active sessions, waiting customers, human handoffs, resolution counts, and average response times.
-  - Distribution charts for predicted intents and detected dialects.
-  - Customer feedback and translation quality log table.
+  - **Left Folder Navigation**: 7 mailboxes with live dynamic ticket counts (📥 Inbox, 👤 Unassigned, 📌 Assigned to Me, ⏳ Waiting for Agent, 💬 Waiting for Customer, 🚨 Escalated, ✅ Resolved).
+  - **Main Ticket List**: Compact rows with customer name, preview, intent, urgency indicators, calibrated confidence percentage, status, agent, and timestamps.
+  - **Details Panel**: Side-by-side inspection without losing inbox context.
+- **Deterministic Sorting & Multidimensional Filtering**: Latest/oldest, highest urgency, lowest confidence, relevance sorting, and filters for intent, urgency, status, language, agent, and full-text search.
+- **Agent Action & Reply Controls**: Editable draft responses, one-click translation to customer's dialect, clarification quick-templates, ticket takeover, reassignment, resolution toggle, and **private staff internal notes** hidden from customers.
+- **Session Analytics**: Active sessions, waiting customers, human handoffs, resolution counts, and average response times.
 
-### C. Role-Based Access Control (RBAC)
+### C. Root-Cause Analysis & Complaint Trends Dashboard (Phase 4)
+- **Dedicated Executive Console**: Separate from Customer Queries, with navigation back to the inbox.
+- **Overview Metrics**: Real-time totals for Period Volume, Refund Issues, Delivery Issues, Payment Issues, Product/Damage Issues, Escalation Rate (%), and Resolution Rate (%).
+- **Complaint Trends Charts**:
+  - Total volume trends with toggle between **Daily** and **Weekly** aggregation.
+  - Refund vs. Delivery Delay complaint trajectory over time.
+  - Urgency distribution (High / Medium / Low) stacked over time.
+  - Escalation Rate (%) and Resolution Rate (%) trajectory.
+- **Explainable Spike Detection**:
+  - Baseline comparison ($+30\%$ threshold against prior comparison period).
+  - Explicit comparison period labeling (e.g. *Current 7 days vs Previous 7 days*).
+  - Statistical threshold guard preventing false alerts on small sample sizes ($N < 5$).
+- **Recurring Issue Clusters**:
+  - Transparent keyword and intent grouping (e.g. *Duplicate Checkout Payment Debits*, *In-Transit Courier SLA Breaches*, *Fragile Item Packaging Damage*, *SMS Gateway OTP Verification*, *Apparel Size SKU Mismatches*).
+  - Real customer quote excerpts, cluster volume, trend vs baseline, typical urgency, and cluster escalation rate.
+- **Product & Process Diagnostic Analysis**:
+  - Factual distinction between:
+    - **Observed Complaint Patterns** (factual evidence from ticket logs)
+    - **Possible Explanations** (operational hypotheses)
+    - **Confirmed Root Causes** (evidence-backed findings)
+- **Emerging Issues Executive Summary**:
+  - Bulleted data-backed takeaways detailing complaint volume concentrations, percentage shifts, and recommended interventions.
+
+### D. Role-Based Access Control (RBAC)
 - Strict access boundary enforced server-side. Customers can never access agent views or session data via URL parameters or navigation tampering.
 
 ---
@@ -89,21 +74,7 @@ Persistent SQLite database (`data/support_platform.db`) operating in **Write-Ahe
 
 ---
 
-## 4. Apple-Inspired Design System
-
-Inspired by Apple's clean, premium, and restrained design principles:
-- **Surfaces**: Crisp white cards (`#ffffff`) on soft off-white canvas (`#fbfbfd`) with subtle 1px borders (`#d2d2d7`) and restrained shadows.
-- **Typography**: Apple system typography stack (`-apple-system, SF Pro Display, SF Pro Text`) complemented by `Noto Sans Tamil`, `Noto Sans Telugu`, and `Noto Sans Devanagari` for native script rendering.
-- **Accents & Indicators**:
-  - System Blue (`#0071e3`): Primary actions and customer messages.
-  - Success Green (`#34c759` / `#1b8738`): Resolved status and low urgency.
-  - Warning Amber (`#ff9500` / `#b25e00`): In-progress status and medium urgency.
-  - Critical Red (`#ff3b30` / `#d70015`): Escalation banners and high urgency.
-- **Visuals**: Clean icons, subtle pills, accessible contrast, and zero excessive gradients or animations.
-
----
-
-## 5. Quick Start & Demo Instructions
+## 4. Quick Start & Demo Instructions
 
 ### Starting the Application
 ```bash
@@ -111,10 +82,6 @@ streamlit run app.py
 ```
 
 ### Pre-Configured Demo Accounts
-For maximum convenience during evaluation, judges can use either:
-1. **One-Click Quick Sign-In Buttons** directly on the login screen or sidebar persona switcher.
-2. **Manual Login Credentials**:
-
 | Persona | Role | Username | Password | Languages Understood |
 | :--- | :--- | :--- | :--- | :--- |
 | **Priya Sharma** | Customer | `customer` | `DemoCustomer@2026` | Telugu + English, Hinglish, English |
@@ -124,17 +91,25 @@ For maximum convenience during evaluation, judges can use either:
 
 ---
 
-## 6. Verification & Automated Test Results
+## 5. Verification & Automated Test Results
 
-### 1. Phase 3 Platform Suite (`test_platform_phase3.py`)
+### 1. Phase 4 Root-Cause Analysis Suite (`test_platform_phase4.py`)
+```bash
+python -m unittest test_platform_phase4.py
+```
+- **Tests run**: 8
+- **Result**: `OK` (100% pass)
+- Verifies: Overview metrics calculation, daily & weekly aggregation views, graceful empty state handling, date range filtering, explainable spike detection baseline, recurring issue clustering with customer quotes, product/process evidence levels, and emerging issues summary.
+
+### 2. Phase 3 Inbox Platform Suite (`test_platform_phase3.py`)
 ```bash
 python -m unittest test_platform_phase3.py
 ```
 - **Tests run**: 8
 - **Result**: `OK` (100% pass)
-- Verifies: 7 mailbox folder counts; deterministic sorting (newest, oldest, highest urgency, lowest confidence); multidimensional filters and search; ticket assignment/reassignment; ticket resolution/reopening; internal notes customer isolation; CSAT calculation formula and sample size; resolved ticket feedback inspection.
+- Verifies: 7 mailbox folder counts; deterministic sorting; multidimensional filters and search; ticket assignment/reassignment; ticket resolution/reopening; internal notes customer isolation; CSAT calculation formula and sample size; resolved ticket feedback inspection.
 
-### 2. Phase 2 Platform Suite (`test_platform_phase2.py`)
+### 3. Phase 2 Live Support Suite (`test_platform_phase2.py`)
 ```bash
 python -m unittest test_platform_phase2.py
 ```
@@ -142,7 +117,7 @@ python -m unittest test_platform_phase2.py
 - **Result**: `OK` (100% pass)
 - Verifies: Native Tamil, Telugu, and Hindi script detection; agent reply translation; translation uncertainty handling; human handoff & agent matching; multi-role message threading; single feedback submission constraint.
 
-### 3. Phase 1 Platform Suite (`test_platform_phase1.py`)
+### 4. Phase 1 Platform Suite (`test_platform_phase1.py`)
 ```bash
 python -m unittest test_platform_phase1.py
 ```
@@ -150,7 +125,7 @@ python -m unittest test_platform_phase1.py
 - **Result**: `OK` (100% pass)
 - Verifies: PBKDF2 password hashing & salts, customer isolation, agent language authorization, availability status updates, conversation creation & AI triage, agent reply dispatch, feedback persistence, and root-cause metrics.
 
-### 4. Application Unit Test Suite (`test_app.py`)
+### 5. Application Unit Test Suite (`test_app.py`)
 ```bash
 python -m unittest test_app.py
 ```
@@ -158,7 +133,7 @@ python -m unittest test_app.py
 - **Result**: `OK` (100% pass)
 - Verifies: Schema count, AI output contract, Telugu+English detection, English translations, original message preservation, backwards-compatibility, and AppTest flows.
 
-### 5. Code-Mixed Benchmark Evaluation Suite (`evaluate.py`)
+### 6. Code-Mixed Benchmark Evaluation Suite (`evaluate.py`)
 ```bash
 python evaluate.py
 ```
@@ -168,7 +143,7 @@ python evaluate.py
 - **Urgency Accuracy**: 100.0%
 - **Escalation Accuracy**: 100.0%
 
-### 6. Service & Subsystem Tests (`pytest tests`)
+### 7. Service & Subsystem Tests (`pytest tests`)
 ```bash
 python -m pytest tests
 ```
