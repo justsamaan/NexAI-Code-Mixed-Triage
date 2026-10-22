@@ -104,6 +104,10 @@ Persistent SQLite database (`data/support_platform.db`) operating in **Write-Ahe
 
 ### Starting the Application
 ```bash
+# Recommended command (avoids Windows PATH issues):
+python -m streamlit run app.py
+
+# Or if streamlit is on your system PATH:
 streamlit run app.py
 ```
 
